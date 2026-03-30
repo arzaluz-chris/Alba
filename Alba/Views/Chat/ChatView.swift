@@ -120,7 +120,7 @@ struct ChatView: View {
                         Image(systemName: "exclamationmark.circle")
                             .foregroundColor(.orange)
                         Text(lang == .es
-                             ? "Limite diario alcanzado. Vuelve manana."
+                             ? "Límite diario alcanzado. Vuelve mañana."
                              : "Daily limit reached. Come back tomorrow.")
                             .font(AlbaFont.rounded(14, weight: .medium))
                             .foregroundColor(.gray)
@@ -163,7 +163,12 @@ struct ChatView: View {
         .onAppear {
             viewModel.language = lang
             if viewModel.messages.isEmpty {
-                viewModel.setInitialMessage(userName: userViewModel.userName, context: initialContext)
+                // Try to resume the current conversation from disk
+                if initialContext == nil, let saved = ConversationStore.shared.loadAllConversations().first(where: { $0.id == viewModel.conversationId }) {
+                    viewModel.loadConversation(saved)
+                } else {
+                    viewModel.setInitialMessage(userName: userViewModel.userName, context: initialContext)
+                }
             }
         }
         .onChange(of: languageManager.language) {

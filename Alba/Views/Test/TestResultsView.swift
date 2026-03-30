@@ -81,7 +81,7 @@ struct TestResultsView: View {
                 // MARK: - Actions
                 VStack(spacing: 12) {
                     let context = lang == .es
-                        ? "Estos son mis resultados del Alba Test sobre mi amistad con \(result.friendName): \(result.finalRating). Area de enfoque: \(result.focusAreaDisplay). Analisis: \(result.summaryAnalysis). Recomendacion: \(result.summaryRecommendation). ¿Puedes ayudarme a explorar esto?"
+                        ? "Estos son mis resultados del Alba Test sobre mi amistad con \(result.friendName): \(result.finalRating). Área de enfoque: \(result.focusAreaDisplay). Análisis: \(result.summaryAnalysis). Recomendación: \(result.summaryRecommendation). ¿Puedes ayudarme a explorar esto?"
                         : "These are my Alba Test results about my friendship with \(result.friendName): \(result.finalRating). Focus area: \(result.focusAreaDisplay). Analysis: \(result.summaryAnalysis). Recommendation: \(result.summaryRecommendation). Can you help me explore this?"
 
                     GlassActionButton(L10n.t(.exploreWithAlba, lang), icon: "bubble.left.and.text.bubble.right", style: .primary) {

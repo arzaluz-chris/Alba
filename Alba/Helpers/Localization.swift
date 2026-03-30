@@ -28,10 +28,14 @@ enum LKey: String {
     case basedOnPerception, exploreWithAlba, backToHome
 
     // Chat
-    case chatTitle, typeHere, chatConnectionError, aiThinking
+    case chatTitle, typeHere, chatConnectionError, chatRateLimited, aiThinking
 
     // Alba Blocks
     case albaBlocksTitle, addAsset, read
+
+    // AI Personalization
+    case aiPersonalization, communicationStyle, responseLength, useEmojis
+    case responseExample
 
     // Article error
     case articleLoadError
@@ -54,69 +58,76 @@ struct L10n {
 
     // MARK: - Spanish
     private static let es: [LKey: String] = [
-        .settings: "Configuracion",
-        .music: "Musica",
+        .settings: "Configuración",
+        .music: "Música",
         .language: "Idioma",
         .spanish: "Español",
-        .english: "Ingles",
+        .english: "Inglés",
 
         .helloName: "Hola %@",
-        .iAmAlbaWelcome: "Soy Alba y estoy aqui para ayudarte a mejorar tus amistades.",
+        .iAmAlbaWelcome: "Soy Alba y estoy aquí para ayudarte a mejorar tus amistades.",
         .albaTest: "Alba Test",
         .albaIA: "AlbaIA",
         .albaBlocks: "Alba Blocks",
 
         .playAll: "Reproducir todo",
-        .songPromptTitle: "¿Quieres repetir la cancion o cambiarla?",
+        .songPromptTitle: "¿Quieres repetir la canción o cambiarla?",
         .repeatSong: "Repetir",
         .changeSong: "Cambiar",
         .noMusic: "No quiero escuchar nada",
-        .searchMusic: "Buscar cancion...",
+        .searchMusic: "Buscar canción...",
         .nowPlaying: "Reproduciendo",
         .appleMusic: "Apple Music",
 
-        .beforeStart: "Antes de iniciar, me gustaria saber unas cosas sobre ti",
+        .beforeStart: "Antes de iniciar, me gustaría saber unas cosas sobre ti",
         .youAre: "Eres...",
         .man: "Hombre",
         .woman: "Mujer",
-        .whatIsYourName: "¿Como te llamas?",
+        .whatIsYourName: "¿Cómo te llamas?",
         .yourNamePlaceholder: "Tu nombre",
-        .nameValidation: "El nombre debe tener +3 letras, iniciar en mayuscula, sin numeros, y solo 1 emoji.",
+        .nameValidation: "El nombre debe tener +3 letras, iniciar en mayúscula, sin números, y solo 1 emoji.",
         .accept: "Aceptar",
-        .signInWithApple: "Iniciar sesion con Apple",
-        .signInSubtitle: "Tu informacion esta segura y nunca sera compartida.",
+        .signInWithApple: "Iniciar sesión con Apple",
+        .signInSubtitle: "Tu información está segura y nunca será compartida.",
         .onboardingHello: "¡Hola! Soy Alba 👋",
-        .onboardingGenderAsk: "Antes de comenzar, ¿como te identificas?",
-        .onboardingNameAsk: "¡Genial! ¿Y como te llamas?",
+        .onboardingGenderAsk: "Antes de comenzar, ¿cómo te identificas?",
+        .onboardingNameAsk: "¡Genial! ¿Y cómo te llamas?",
         .onboardingNiceName: "Mucho gusto, %@ ✨",
         .onboardingReady: "Estoy lista para ayudarte a mejorar tus amistades. ¿Empezamos?",
 
         .albaTestTitle: "Alba Test",
         .welcomeGendered: "Bienvenid%@ %@",
-        .testIntro: "Este Test te ayudara a saber que clase de amistad tienes con esa persona y es por eso que necesito que respondas con sinceridad las siguientes preguntas.",
-        .instructionChoose: "Elige la opcion que mejor te describa.",
+        .testIntro: "Este Test te ayudará a saber qué clase de amistad tienes con esa persona y es por eso que necesito que respondas con sinceridad las siguientes preguntas.",
+        .instructionChoose: "Elige la opción que mejor te describa.",
         .startTest: "Iniciar Test",
         .questionProgress: "Pregunta %d de %d",
         .seeResults: "Ver Resultados",
         .nextQuestion: "Siguiente Pregunta",
-        .friendNamePlaceholder: "Escribe el nombre aqui (Ej: Laura)",
-        .friendNameValidation: "Debe empezar con Mayuscula, tener minimo 3 letras, y no contener numeros ni simbolos.",
+        .friendNamePlaceholder: "Escribe el nombre aquí (Ej: Laura)",
+        .friendNameValidation: "Debe empezar con Mayúscula, tener mínimo 3 letras, y no contener números ni símbolos.",
         .preferNotName: "Prefiero no escribir el nombre",
 
-        .basedOnPerception: "El analisis se basa en tu percepcion de la relacion al momento de responder el test.",
+        .basedOnPerception: "El análisis se basa en tu percepción de la relación al momento de responder el test.",
         .exploreWithAlba: "Explorar Respuestas con AlbaIA",
         .backToHome: "Regresar a la pantalla de inicio",
 
         .chatTitle: "AlbaIA",
-        .typeHere: "Escribe aqui...",
-        .chatConnectionError: "¡Uy! Parece que algo fallo con la conexion.",
-        .aiThinking: "Alba esta pensando...",
+        .typeHere: "Escribe aquí...",
+        .chatConnectionError: "¡Uy! Parece que algo falló con la conexión.",
+        .chatRateLimited: "El servicio de inteligencia artificial (Gemini) ha alcanzado su límite de uso por hoy. Vuelve a intentarlo mañana.",
+        .aiThinking: "Alba está pensando...",
 
         .albaBlocksTitle: "Alba Blocks",
         .addAsset: "Agrega %@ a Assets",
         .read: "Leer",
 
-        .articleLoadError: "No se pudo cargar el articulo.",
+        .aiPersonalization: "Alba IA",
+        .communicationStyle: "Estilo de comunicación",
+        .responseLength: "Extensión de respuesta",
+        .useEmojis: "Usar emojis",
+        .responseExample: "Ejemplo de respuesta",
+
+        .articleLoadError: "No se pudo cargar el artículo.",
 
         .tutSkip: "Omitir",
         .tutNext: "Siguiente",
@@ -183,11 +194,18 @@ struct L10n {
         .chatTitle: "AlbaAI",
         .typeHere: "Type here...",
         .chatConnectionError: "Uh-oh! Something went wrong with the connection.",
+        .chatRateLimited: "The AI service (Gemini) has reached its daily usage limit. Please try again tomorrow.",
         .aiThinking: "Alba is thinking...",
 
         .albaBlocksTitle: "Alba Blocks",
         .addAsset: "Add %@ to Assets",
         .read: "Read",
+
+        .aiPersonalization: "Alba AI",
+        .communicationStyle: "Communication style",
+        .responseLength: "Response length",
+        .useEmojis: "Use emojis",
+        .responseExample: "Response example",
 
         .articleLoadError: "Couldn't load the article.",
 

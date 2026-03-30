@@ -91,7 +91,7 @@ final class GeminiService {
         }
     }
 
-    func sendMessage(_ prompt: String, history: [Message], language: AppLanguage, hiddenContext: String? = nil) async throws -> String {
+    func sendMessage(_ prompt: String, history: [Message], language: AppLanguage, personalization: AIPersonalization = AIPersonalization(), hiddenContext: String? = nil) async throws -> String {
         requestCount += 1
         let requestId = requestCount
 
@@ -162,11 +162,11 @@ final class GeminiService {
         let body: [String: Any] = [
             "contents": contents,
             "systemInstruction": [
-                "parts": [["text": systemInstruction(for: language)]]
+                "parts": [["text": systemInstruction(for: language) + personalization.personalizationPrompt(for: language)]]
             ],
             "generationConfig": [
                 "temperature": 0.7,
-                "maxOutputTokens": 1024
+                "maxOutputTokens": personalization.length.maxOutputTokens
             ]
         ]
 
@@ -191,6 +191,9 @@ final class GeminiService {
         guard (200...299).contains(httpResponse.statusCode) else {
             let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
             logger.error("❌ [Request #\(requestId)] API Error \(httpResponse.statusCode): \(errorBody.prefix(500))")
+            if httpResponse.statusCode == 429 {
+                throw GeminiError.rateLimited
+            }
             throw GeminiError.apiError(statusCode: httpResponse.statusCode, message: errorBody)
         }
 
@@ -278,6 +281,7 @@ enum GeminiError: LocalizedError {
     case invalidURL
     case invalidResponse
     case apiError(statusCode: Int, message: String)
+    case rateLimited
     case decodingError
 
     var errorDescription: String? {
@@ -285,6 +289,7 @@ enum GeminiError: LocalizedError {
         case .invalidURL: return "Invalid API URL"
         case .invalidResponse: return "Invalid server response"
         case .apiError(let code, let msg): return "API Error (\(code)): \(msg)"
+        case .rateLimited: return "Gemini API rate limit reached"
         case .decodingError: return "Failed to decode response"
         }
     }

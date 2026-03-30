@@ -41,7 +41,7 @@ struct JournalView: View {
                         Image(systemName: "person.2.circle")
                             .font(.system(size: 60))
                             .foregroundColor(.albaAccent.opacity(0.4))
-                        Text(lang == .es ? "Aun no has evaluado ninguna amistad" : "You haven't evaluated any friendships yet")
+                        Text(lang == .es ? "Aún no has evaluado ninguna amistad" : "You haven't evaluated any friendships yet")
                             .font(AlbaFont.rounded(16, weight: .medium))
                             .foregroundColor(.gray)
                             .multilineTextAlignment(.center)
@@ -105,7 +105,7 @@ struct JournalView: View {
                         .foregroundColor(.gray)
                 }
 
-                Text(lang == .es ? "\(count) evaluacion\(count == 1 ? "" : "es")" : "\(count) evaluation\(count == 1 ? "" : "s")")
+                Text(lang == .es ? "\(count) evaluación\(count == 1 ? "" : "es")" : "\(count) evaluation\(count == 1 ? "" : "s")")
                     .font(AlbaFont.rounded(12))
                     .foregroundColor(.gray.opacity(0.7))
             }

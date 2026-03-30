@@ -13,7 +13,7 @@ struct FriendDetailView: View {
     private let permaCategories: [(key: String, labelEs: String, labelEn: String, icon: String)] = [
         ("support", "Apoyo", "Support", "hand.raised.fill"),
         ("trust", "Confianza", "Trust", "lock.shield.fill"),
-        ("limits", "Limites", "Boundaries", "hand.raised.slash.fill"),
+        ("limits", "Límites", "Boundaries", "hand.raised.slash.fill"),
         ("assertiveness", "Asertividad", "Assertiveness", "bubble.left.and.exclamationmark.bubble.right.fill")
     ]
 
@@ -75,7 +75,7 @@ struct FriendDetailView: View {
                         Button {
                             HapticManager.shared.mediumImpact()
                             let context = lang == .es
-                                ? "Quiero hablar sobre mi amistad con \(friendName). Mis resultados mas recientes: \(latest?.rating ?? "sin evaluar"), area de enfoque: \(latest?.focusArea ?? "ninguna")."
+                                ? "Quiero hablar sobre mi amistad con \(friendName). Mis resultados más recientes: \(latest?.rating ?? "sin evaluar"), área de enfoque: \(latest?.focusArea ?? "ninguna")."
                                 : "I want to talk about my friendship with \(friendName). My latest results: \(latest?.rating ?? "not evaluated"), focus area: \(latest?.focusArea ?? "none")."
                             dismiss()
                             onNavigate?(.chat(initialContext: context))
@@ -113,7 +113,7 @@ struct FriendDetailView: View {
                                     .font(.system(size: 18))
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(lang == .es
-                                         ? "Han pasado \(days) dias"
+                                         ? "Han pasado \(days) días"
                                          : "It's been \(days) days")
                                         .font(AlbaFont.rounded(14, weight: .bold))
                                         .foregroundColor(.albaText)

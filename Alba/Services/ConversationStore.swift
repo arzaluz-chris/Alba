@@ -112,9 +112,6 @@ final class ConversationStore {
 final class RateLimiter: ObservableObject {
     static let shared = RateLimiter()
 
-    /// Max messages per day (Gemini free tier: 500 RPD, we use 30 to be conservative)
-    let dailyLimit: Int = 30
-
     @Published var messagesUsedToday: Int = 0
 
     private let countKey = "alba_daily_message_count"
@@ -122,6 +119,14 @@ final class RateLimiter: ObservableObject {
 
     private init() {
         resetIfNewDay()
+    }
+
+    /// Limit depends on whether the user signed in with Apple
+    var dailyLimit: Int {
+        let isRegistered = KeychainHelper.load(key: "appleUserIdentifier") != nil
+        return isRegistered
+            ? RemoteConfigService.shared.maxDailyChatMessages
+            : RemoteConfigService.shared.maxDailyUnregisteredMessages
     }
 
     var messagesRemaining: Int {
@@ -133,7 +138,8 @@ final class RateLimiter: ObservableObject {
     }
 
     var usagePercentage: Double {
-        Double(messagesUsedToday) / Double(dailyLimit)
+        guard dailyLimit > 0 else { return 0.0 }
+        return Double(messagesUsedToday) / Double(dailyLimit)
     }
 
     func recordMessage() {
@@ -150,7 +156,6 @@ final class RateLimiter: ObservableObject {
         if let savedDate = UserDefaults.standard.object(forKey: dateKey) as? Date {
             let savedDay = calendar.startOfDay(for: savedDate)
             if today > savedDay {
-                // New day - reset counter
                 messagesUsedToday = 0
                 UserDefaults.standard.set(0, forKey: countKey)
                 UserDefaults.standard.set(today, forKey: dateKey)
@@ -158,7 +163,6 @@ final class RateLimiter: ObservableObject {
                 return
             }
         } else {
-            // First time
             UserDefaults.standard.set(today, forKey: dateKey)
         }
 

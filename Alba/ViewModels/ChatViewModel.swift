@@ -15,16 +15,48 @@ final class ChatViewModel: ObservableObject {
     private let userViewModel: UserViewModel
     private let rateLimiter = RateLimiter.shared
     private var hiddenContext: String?
-    private var conversationId: UUID = UUID() // Single ID per session
+    private(set) var conversationId: UUID
     var language: AppLanguage = .es
+
+    private static let conversationIdKey = "alba_current_conversation_id"
+    private static let conversationTimestampKey = "alba_current_conversation_timestamp"
+    /// Minutes of inactivity before starting a new conversation
+    private static let sessionTimeoutMinutes: Double = 30
 
     var messagesRemaining: Int { rateLimiter.messagesRemaining }
     var dailyLimit: Int { rateLimiter.dailyLimit }
 
     init(userViewModel: UserViewModel) {
         self.userViewModel = userViewModel
+        self.conversationId = Self.resolveConversationId()
         self.limitReached = rateLimiter.isLimitReached
-        logger.info("🟢 ChatViewModel init. Remaining: \(self.rateLimiter.messagesRemaining)/\(self.rateLimiter.dailyLimit)")
+        logger.info("🟢 ChatViewModel init. ConversationId: \(self.conversationId). Remaining: \(self.rateLimiter.messagesRemaining)/\(self.rateLimiter.dailyLimit)")
+    }
+
+    /// Reuses the current conversation ID if the last activity was recent, otherwise creates a new one.
+    private static func resolveConversationId() -> UUID {
+        let defaults = UserDefaults.standard
+        if let idString = defaults.string(forKey: conversationIdKey),
+           let existingId = UUID(uuidString: idString),
+           let lastTimestamp = defaults.object(forKey: conversationTimestampKey) as? Date,
+           Date().timeIntervalSince(lastTimestamp) < sessionTimeoutMinutes * 60 {
+            logger.info("♻️ Resuming conversation \(existingId)")
+            return existingId
+        }
+        let newId = UUID()
+        defaults.set(newId.uuidString, forKey: conversationIdKey)
+        defaults.set(Date(), forKey: conversationTimestampKey)
+        logger.info("🆕 New conversation \(newId)")
+        return newId
+    }
+
+    /// Call when the user explicitly starts a fresh conversation
+    func startNewConversation() {
+        conversationId = UUID()
+        UserDefaults.standard.set(conversationId.uuidString, forKey: Self.conversationIdKey)
+        UserDefaults.standard.set(Date(), forKey: Self.conversationTimestampKey)
+        messages = []
+        smartSuggestions = []
     }
 
     func setInitialMessage(userName: String, context: String? = nil) {
@@ -36,18 +68,18 @@ final class ChatViewModel: ObservableObject {
 
             callGemini(
                 prompt: language == .es
-                    ? "Analiza estos resultados usando el modelo PERMA. Dame un analisis breve y un ejercicio concreto."
+                    ? "Analiza estos resultados usando el modelo PERMA. Dame un análisis breve y un ejercicio concreto."
                     : "Analyze these results using the PERMA model. Give a brief analysis and a concrete exercise.",
                 history: [],
                 hiddenContext: context
             )
         } else {
             let greeting = language == .es
-                ? "Hola \(userName), soy Alba. Estoy aqui para ayudarte a mejorar tus amistades. Cuentame, ¿como estan tus relaciones hoy?"
+                ? "Hola \(userName), soy Alba. Estoy aquí para ayudarte a mejorar tus amistades. Cuéntame, ¿cómo están tus relaciones hoy?"
                 : "Hi \(userName), I'm Alba. I'm here to help you improve your friendships. Tell me—how are your relationships today?"
             messages.append(Message(text: greeting, isUser: false))
             smartSuggestions = language == .es
-                ? ["Tuve un problema con un amigo", "¿Como poner limites?", "Necesito hablar"]
+                ? ["Tuve un problema con un amigo", "¿Cómo poner límites?", "Necesito hablar"]
                 : ["I had a problem with a friend", "How to set boundaries?", "I need to talk"]
         }
     }
@@ -55,12 +87,14 @@ final class ChatViewModel: ObservableObject {
     func loadConversation(_ saved: SavedConversation) {
         messages = saved.messages.map { Message(text: $0.text, isUser: $0.isUser) }
         conversationId = saved.id
+        UserDefaults.standard.set(conversationId.uuidString, forKey: Self.conversationIdKey)
+        UserDefaults.standard.set(Date(), forKey: Self.conversationTimestampKey)
         smartSuggestions = []
     }
 
     func saveCurrentConversation() {
-        // Always update the SAME conversation (same ID), not create new ones
         ConversationStore.shared.saveConversation(id: conversationId, messages: messages, language: language)
+        UserDefaults.standard.set(Date(), forKey: Self.conversationTimestampKey)
     }
 
     func sendMessage() {
@@ -103,7 +137,9 @@ final class ChatViewModel: ObservableObject {
 
             do {
                 let rawResponse = try await geminiService.sendMessage(
-                    prompt, history: history, language: language, hiddenContext: hiddenContext
+                    prompt, history: history, language: language,
+                    personalization: userViewModel.aiPersonalization,
+                    hiddenContext: hiddenContext
                 )
                 rateLimiter.recordMessage()
                 limitReached = rateLimiter.isLimitReached
@@ -118,7 +154,7 @@ final class ChatViewModel: ObservableObject {
                         messages.append(Message(text: cleanText, isUser: false))
                         var testMsg = Message(
                             text: language == .es
-                                ? "¿Quieres evaluar tu amistad con \(friendName)? Haz el Alba Test para obtener un analisis PERMA completo."
+                                ? "¿Quieres evaluar tu amistad con \(friendName)? Haz el Alba Test para obtener un análisis PERMA completo."
                                 : "Want to evaluate your friendship with \(friendName)? Take the Alba Test for a full PERMA analysis.",
                             isUser: false
                         )
@@ -136,6 +172,12 @@ final class ChatViewModel: ObservableObject {
                 saveCurrentConversation()
                 smartSuggestions = suggestions
 
+            } catch GeminiError.rateLimited {
+                logger.error("⚠️ Gemini rate limited")
+                withAnimation {
+                    messages.append(Message(text: L10n.t(.chatRateLimited, language), isUser: false))
+                }
+                HapticManager.shared.notification(.warning)
             } catch {
                 logger.error("❌ Gemini error: \(error.localizedDescription)")
                 withAnimation {
@@ -201,7 +243,7 @@ final class ChatViewModel: ObservableObject {
         // No suggestions tag found - return as-is with empty suggestions
         // Fall back to basic context suggestions
         let fallback = language == .es
-            ? ["Cuentame mas", "Dame un ejercicio", "¿Que mas puedo hacer?"]
+            ? ["Cuéntame más", "Dame un ejercicio", "¿Qué más puedo hacer?"]
             : ["Tell me more", "Give me an exercise", "What else can I do?"]
         return (response, fallback)
     }

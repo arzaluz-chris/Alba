@@ -210,7 +210,7 @@ struct MusicSearchView: View {
                         .font(.system(size: 30))
                         .foregroundColor(.gray.opacity(0.4))
                     Text(language == .es
-                         ? "No se pudieron cargar las canciones. Verifica tu conexion."
+                         ? "No se pudieron cargar las canciones. Verifica tu conexión."
                          : "Couldn't load songs. Check your connection.")
                         .font(AlbaFont.rounded(14))
                         .foregroundColor(.gray)

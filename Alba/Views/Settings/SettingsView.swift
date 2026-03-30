@@ -32,6 +32,24 @@ struct SettingsView: View {
                     }
                     .listRowBackground(Color.white.opacity(0.5))
 
+                    // MARK: - AI Personalization
+                    NavigationLink {
+                        AIPersonalizationView()
+                    } label: {
+                        HStack(spacing: 14) {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.albaAccent)
+                                .frame(width: 32)
+
+                            Text(L10n.t(.aiPersonalization, lang))
+                                .font(AlbaFont.rounded(16, weight: .medium))
+                                .foregroundColor(.albaText)
+                        }
+                        .padding(.vertical, 6)
+                    }
+                    .listRowBackground(Color.white.opacity(0.5))
+
                     // MARK: - Language
                     NavigationLink {
                         LanguageSelectionView()
@@ -173,7 +191,7 @@ struct AboutView: View {
                             .foregroundColor(.albaText)
 
                         Text(lang == .es
-                             ? "Tu guia para mejorar tus amistades"
+                             ? "Tu guía para mejorar tus amistades"
                              : "Your guide to better friendships")
                             .font(AlbaFont.rounded(15))
                             .foregroundColor(.albaText.opacity(0.6))
@@ -189,7 +207,7 @@ struct AboutView: View {
 
                     // Credits card
                     VStack(alignment: .leading, spacing: 16) {
-                        Text(lang == .es ? "Creditos" : "Credits")
+                        Text(lang == .es ? "Créditos" : "Credits")
                             .font(AlbaFont.serif(20, weight: .bold))
                             .foregroundColor(.albaText)
 
@@ -212,7 +230,7 @@ struct AboutView: View {
                         )
 
                         creditRow(
-                            role: lang == .es ? "Musica" : "Music",
+                            role: lang == .es ? "Música" : "Music",
                             name: "Apple Music"
                         )
                     }
@@ -236,7 +254,7 @@ struct AboutView: View {
                             .multilineTextAlignment(.center)
 
                         Text(lang == .es
-                             ? "Hecha con amor en Mexico"
+                             ? "Hecha con amor en México"
                              : "Made with love in Mexico")
                             .font(AlbaFont.rounded(13, weight: .medium))
                             .foregroundColor(.albaAccent.opacity(0.7))

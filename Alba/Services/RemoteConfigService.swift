@@ -6,8 +6,9 @@ private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Alba", c
 // MARK: - Config Model
 
 struct AppConfig: Codable {
-    var geminiModel: String = "gemini-2.5-flash"
+    var geminiModel: String = "gemini-3.1-flash-lite-preview"
     var maxDailyChatMessages: Int = 50
+    var maxDailyUnregisteredMessages: Int = 15
     var chatEnabled: Bool = true
     var albaTestEnabled: Bool = true
     var journalEnabled: Bool = true
@@ -29,6 +30,7 @@ final class RemoteConfigService {
 
     var geminiModel: String { config.geminiModel }
     var maxDailyChatMessages: Int { config.maxDailyChatMessages }
+    var maxDailyUnregisteredMessages: Int { config.maxDailyUnregisteredMessages }
     var isChatEnabled: Bool { config.chatEnabled }
     var isAlbaTestEnabled: Bool { config.albaTestEnabled }
     var isJournalEnabled: Bool { config.journalEnabled }
