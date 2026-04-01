@@ -9,6 +9,7 @@ struct ChatView: View {
     let initialContext: String?
 
     @State private var showHistory = false
+    @State private var showAIOnboarding = false
 
     init(currentView: Binding<AppState>, userViewModel: UserViewModel, initialContext: String?) {
         self._currentView = currentView
@@ -161,6 +162,9 @@ struct ChatView: View {
             }
         }
         .onAppear {
+            if !userViewModel.hasCompletedAIOnboarding {
+                showAIOnboarding = true
+            }
             viewModel.language = lang
             if viewModel.messages.isEmpty {
                 // Try to resume the current conversation from disk
@@ -176,6 +180,9 @@ struct ChatView: View {
         }
         .sheet(isPresented: $showHistory) {
             ChatHistoryView(viewModel: viewModel)
+        }
+        .fullScreenCover(isPresented: $showAIOnboarding) {
+            AlbaAIOnboardingView()
         }
     }
 

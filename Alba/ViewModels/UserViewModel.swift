@@ -15,6 +15,9 @@ final class UserViewModel: ObservableObject {
     @Published var hasCompletedOnboarding: Bool = false {
         didSet { UserDefaults.standard.set(hasCompletedOnboarding, forKey: "has_completed_onboarding") }
     }
+    @Published var hasCompletedAIOnboarding: Bool = false {
+        didSet { UserDefaults.standard.set(hasCompletedAIOnboarding, forKey: "has_completed_ai_onboarding") }
+    }
     @Published var aiPersonalization: AIPersonalization = AIPersonalization() {
         didSet {
             if let data = try? JSONEncoder().encode(aiPersonalization) {
@@ -29,6 +32,7 @@ final class UserViewModel: ObservableObject {
             self.selectedGender = Gender(rawValue: genderRaw)
         }
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "has_completed_onboarding")
+        self.hasCompletedAIOnboarding = UserDefaults.standard.bool(forKey: "has_completed_ai_onboarding")
         if let data = UserDefaults.standard.data(forKey: "ai_personalization"),
            let personalization = try? JSONDecoder().decode(AIPersonalization.self, from: data) {
             self.aiPersonalization = personalization

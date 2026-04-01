@@ -162,7 +162,7 @@ struct AIPersonalizationView: View {
 
 // MARK: - Style Card
 
-private struct StyleCard: View {
+struct StyleCard: View {
     let style: CommunicationStyle
     let isSelected: Bool
     let lang: AppLanguage
@@ -218,7 +218,7 @@ private struct StyleCard: View {
 
 // MARK: - Example Bubble
 
-private struct ExampleBubble: View {
+struct ExampleBubble: View {
     let text: String
     let title: String
 

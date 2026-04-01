@@ -42,6 +42,15 @@ enum LKey: String {
 
     // Tutorial
     case tutSkip, tutNext, tutOpen, tutStart, tutDone
+
+    // AI Onboarding
+    case aiOnboardingPrivacyTitle, aiOnboardingPrivacyBody, aiOnboardingDisclaimerBody
+    case aiOnboardingAccept
+    case aiOnboardingTourChatTitle, aiOnboardingTourChatBody
+    case aiOnboardingTourTestTitle, aiOnboardingTourTestBody
+    case aiOnboardingTourPersonalizationTitle, aiOnboardingTourPersonalizationBody
+    case aiOnboardingDoneTitle, aiOnboardingDoneBody
+    case aiOnboardingContinue, aiOnboardingGetStarted
 }
 
 // MARK: - Localization Helper
@@ -133,7 +142,22 @@ struct L10n {
         .tutNext: "Siguiente",
         .tutOpen: "Abrir",
         .tutStart: "Empezar",
-        .tutDone: "Entendido"
+        .tutDone: "Entendido",
+
+        .aiOnboardingPrivacyTitle: "Antes de comenzar",
+        .aiOnboardingPrivacyBody: "Tu privacidad es importante. Tus conversaciones con Alba se procesan de forma segura y no se comparten con terceros, cumpliendo con las regulaciones de proteccion de datos aplicables.",
+        .aiOnboardingDisclaimerBody: "AlbaIA utiliza inteligencia artificial (Gemini). Las respuestas pueden contener errores y **no sustituyen** el consejo profesional de un psicologo o terapeuta.",
+        .aiOnboardingAccept: "Acepto y continuar",
+        .aiOnboardingTourChatTitle: "Platica con Alba",
+        .aiOnboardingTourChatBody: "Preguntale a Alba sobre tus amistades. Recibe consejos basados en psicologia positiva y el modelo PERMA.",
+        .aiOnboardingTourTestTitle: "Test desde el chat",
+        .aiOnboardingTourTestBody: "Si mencionas a un amigo que no has evaluado, Alba te sugerira hacer el Alba Test directamente desde aqui.",
+        .aiOnboardingTourPersonalizationTitle: "Personaliza a Alba",
+        .aiOnboardingTourPersonalizationBody: "Elige como quieres que Alba se comunique contigo. Puedes cambiar esto despues en Configuracion.",
+        .aiOnboardingDoneTitle: "Todo listo",
+        .aiOnboardingDoneBody: "Alba esta lista para ayudarte. Comencemos!",
+        .aiOnboardingContinue: "Continuar",
+        .aiOnboardingGetStarted: "Comenzar"
     ]
 
     // MARK: - English
@@ -213,6 +237,21 @@ struct L10n {
         .tutNext: "Next",
         .tutOpen: "Open",
         .tutStart: "Start",
-        .tutDone: "Got it"
+        .tutDone: "Got it",
+
+        .aiOnboardingPrivacyTitle: "Before we begin",
+        .aiOnboardingPrivacyBody: "Your privacy matters. Your conversations with Alba are processed securely and are not shared with third parties, in compliance with applicable data protection regulations.",
+        .aiOnboardingDisclaimerBody: "AlbaAI uses artificial intelligence (Gemini). Responses may contain errors and **do not substitute** professional advice from a psychologist or therapist.",
+        .aiOnboardingAccept: "I accept and continue",
+        .aiOnboardingTourChatTitle: "Chat with Alba",
+        .aiOnboardingTourChatBody: "Ask Alba about your friendships. Get advice based on positive psychology and the PERMA model.",
+        .aiOnboardingTourTestTitle: "Test from chat",
+        .aiOnboardingTourTestBody: "If you mention a friend you haven't evaluated, Alba will suggest taking the Alba Test right from here.",
+        .aiOnboardingTourPersonalizationTitle: "Personalize Alba",
+        .aiOnboardingTourPersonalizationBody: "Choose how you want Alba to communicate with you. You can change this later in Settings.",
+        .aiOnboardingDoneTitle: "All set",
+        .aiOnboardingDoneBody: "Alba is ready to help you. Let's get started!",
+        .aiOnboardingContinue: "Continue",
+        .aiOnboardingGetStarted: "Get started"
     ]
 }
