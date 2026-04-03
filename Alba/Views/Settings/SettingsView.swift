@@ -3,7 +3,14 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var languageManager: LanguageManager
     @EnvironmentObject var musicViewModel: MusicViewModel
+    @EnvironmentObject var userViewModel: UserViewModel
+    @EnvironmentObject var authManager: AuthManager
     @Environment(\.dismiss) private var dismiss
+
+    @State private var showDeleteConfirm: Bool = false
+    @State private var showChangeName: Bool = false
+    @State private var newName: String = ""
+    var onDeleteAccount: (() -> Void)?
 
     private var lang: AppLanguage { languageManager.language }
 
@@ -68,6 +75,24 @@ struct SettingsView: View {
                     }
                     .listRowBackground(Color.white.opacity(0.5))
 
+                    // MARK: - Journal Security
+                    NavigationLink {
+                        JournalSecuritySettingsView()
+                    } label: {
+                        HStack(spacing: 14) {
+                            Image(systemName: "lock.shield")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.albaAccent)
+                                .frame(width: 32)
+
+                            Text(lang == .es ? "Seguridad del Journal" : "Journal Security")
+                                .font(AlbaFont.rounded(16, weight: .medium))
+                                .foregroundColor(.albaText)
+                        }
+                        .padding(.vertical, 6)
+                    }
+                    .listRowBackground(Color.white.opacity(0.5))
+
                     // MARK: - About
                     NavigationLink {
                         AboutView()
@@ -85,10 +110,41 @@ struct SettingsView: View {
                         .padding(.vertical, 6)
                     }
                     .listRowBackground(Color.white.opacity(0.5))
+
+                    // MARK: - Account
+                    NavigationLink {
+                        accountView
+                    } label: {
+                        HStack(spacing: 14) {
+                            Image(systemName: "person.circle")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.albaAccent)
+                                .frame(width: 32)
+
+                            Text(lang == .es ? "Cuenta" : "Account")
+                                .font(AlbaFont.rounded(16, weight: .medium))
+                                .foregroundColor(.albaText)
+                        }
+                        .padding(.vertical, 6)
+                    }
+                    .listRowBackground(Color.white.opacity(0.5))
                 }
                 .scrollContentBackground(.hidden)
             }
             .navigationBarTitleDisplayMode(.inline)
+            .alert(
+                lang == .es ? "¿Eliminar tu cuenta?" : "Delete your account?",
+                isPresented: $showDeleteConfirm
+            ) {
+                Button(lang == .es ? "Cancelar" : "Cancel", role: .cancel) {}
+                Button(lang == .es ? "Eliminar todo" : "Delete everything", role: .destructive) {
+                    deleteAllData()
+                }
+            } message: {
+                Text(lang == .es
+                     ? "Se eliminarán todos tus datos: conversaciones, evaluaciones, diario y configuración. Esta acción no se puede deshacer."
+                     : "All your data will be deleted: conversations, evaluations, diary, and settings. This action cannot be undone.")
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -107,6 +163,135 @@ struct SettingsView: View {
                 }
             }
         }
+    }
+
+    private var accountView: some View {
+        ZStack {
+            Color.albaBackground.ignoresSafeArea()
+
+            List {
+                // User info
+                Section {
+                    HStack(spacing: 14) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.albaAccent.opacity(0.15))
+                                .frame(width: 44, height: 44)
+                            Text(String(userViewModel.userName.prefix(1)).uppercased())
+                                .font(AlbaFont.serif(20, weight: .bold))
+                                .foregroundColor(.albaAccent)
+                        }
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(userViewModel.userName)
+                                .font(AlbaFont.rounded(17, weight: .semibold))
+                                .foregroundColor(.albaText)
+                            if authManager.isSignedIn {
+                                Text("Apple ID")
+                                    .font(AlbaFont.rounded(12))
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+                .listRowBackground(Color.white.opacity(0.5))
+
+                // Change name
+                Section {
+                    Button {
+                        newName = userViewModel.userName
+                        showChangeName = true
+                    } label: {
+                        HStack(spacing: 14) {
+                            Image(systemName: "pencil")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.albaAccent)
+                                .frame(width: 32)
+                            Text(lang == .es ? "Cambiar nombre" : "Change name")
+                                .font(AlbaFont.rounded(16, weight: .medium))
+                                .foregroundColor(.albaText)
+                        }
+                        .padding(.vertical, 6)
+                    }
+                }
+                .listRowBackground(Color.white.opacity(0.5))
+
+                // Delete account
+                Section {
+                    Button(role: .destructive) {
+                        showDeleteConfirm = true
+                    } label: {
+                        HStack(spacing: 14) {
+                            Image(systemName: "trash")
+                                .font(.system(size: 18, weight: .medium))
+                                .frame(width: 32)
+                            Text(lang == .es ? "Eliminar cuenta" : "Delete account")
+                                .font(AlbaFont.rounded(16, weight: .medium))
+                        }
+                        .padding(.vertical, 6)
+                    }
+                } footer: {
+                    Text(lang == .es
+                         ? "Esto eliminara todos tus datos de forma permanente."
+                         : "This will permanently delete all your data.")
+                        .font(AlbaFont.rounded(12))
+                }
+                .listRowBackground(Color.white.opacity(0.5))
+            }
+            .scrollContentBackground(.hidden)
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(lang == .es ? "Cuenta" : "Account")
+                    .font(AlbaFont.serif(20, weight: .bold))
+                    .foregroundColor(.albaText)
+            }
+        }
+        .alert(lang == .es ? "Cambiar nombre" : "Change name", isPresented: $showChangeName) {
+            TextField(lang == .es ? "Tu nombre" : "Your name", text: $newName)
+            Button(lang == .es ? "Guardar" : "Save") {
+                let trimmed = newName.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !trimmed.isEmpty {
+                    userViewModel.userName = trimmed
+                    HapticManager.shared.notification(.success)
+                }
+            }
+            Button(lang == .es ? "Cancelar" : "Cancel", role: .cancel) {}
+        }
+    }
+
+    private func deleteAllData() {
+        // Delete all user data
+        ConversationStore.shared.deleteAll()
+        FriendshipStore.shared.deleteAll()
+        JournalEntryStore.shared.deleteAll()
+        JournalSecurityManager.shared.removePIN()
+        authManager.signOut()
+
+        // Clear UserDefaults
+        let keysToRemove = [
+            "user_name", "user_gender",
+            "has_completed_onboarding", "has_completed_ai_onboarding",
+            "ai_personalization", "hasSeenJournalSecurityPrompt",
+            "alba_current_conversation_id", "alba_current_conversation_timestamp",
+            "alba_daily_message_count", "alba_daily_message_date"
+        ]
+        for key in keysToRemove {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
+
+        // Reset user view model
+        userViewModel.userName = ""
+        userViewModel.selectedGender = nil
+        userViewModel.hasCompletedOnboarding = false
+        userViewModel.hasCompletedAIOnboarding = false
+        userViewModel.aiPersonalization = AIPersonalization()
+
+        HapticManager.shared.notification(.warning)
+        dismiss()
+        onDeleteAccount?()
     }
 }
 
@@ -244,22 +429,41 @@ struct AboutView: View {
                     .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 6)
                     .padding(.horizontal, 24)
 
-                    // PERMA attribution
-                    VStack(spacing: 8) {
-                        Text(lang == .es
-                             ? "Basada en el modelo PERMA de Martin Seligman"
-                             : "Based on Martin Seligman's PERMA model")
-                            .font(AlbaFont.rounded(13))
-                            .foregroundColor(.gray)
-                            .multilineTextAlignment(.center)
+                    // Positive psychology attribution
+                    Text(lang == .es
+                         ? "Basada en estudios de psicología positiva"
+                         : "Based on positive psychology studies")
+                        .font(AlbaFont.rounded(13))
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
 
-                        Text(lang == .es
-                             ? "Hecha con amor en México"
-                             : "Made with love in Mexico")
-                            .font(AlbaFont.rounded(13, weight: .medium))
-                            .foregroundColor(.albaAccent.opacity(0.7))
+                    // Academic sources
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(lang == .es ? "Fuentes" : "Sources")
+                            .font(AlbaFont.serif(16, weight: .bold))
+                            .foregroundColor(.albaText)
+
+                        Text("Seligman, M. E. P. (2011). Flourish: A Visionary New Understanding of Happiness and Well-being. Free Press.")
+                            .font(AlbaFont.rounded(12))
+                            .foregroundColor(.albaText.opacity(0.7))
+                            .lineSpacing(3)
+
+                        Text("Demir, M., & Weitekamp, L. A. (2007). I am so happy cause today I found my friend: Friendship and personality as predictors of happiness. Journal of Happiness Studies, 8(2), 181-211.")
+                            .font(AlbaFont.rounded(12))
+                            .foregroundColor(.albaText.opacity(0.7))
+                            .lineSpacing(3)
+
+                        Text("Reis, H. T., Sheldon, K. M., Gable, S. L., Roscoe, J., & Ryan, R. M. (2000). Daily well-being: The role of autonomy, competence, and relatedness. Personality and Social Psychology Bulletin, 26(4), 419-435.")
+                            .font(AlbaFont.rounded(12))
+                            .foregroundColor(.albaText.opacity(0.7))
+                            .lineSpacing(3)
                     }
-                    .padding(.horizontal, 40)
+                    .padding(16)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.white.opacity(0.3), lineWidth: 0.8))
+                    .padding(.horizontal, 24)
 
                     Spacer().frame(height: 40)
                 }

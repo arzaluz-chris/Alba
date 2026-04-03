@@ -60,6 +60,10 @@ struct ContentView: View {
             ChatView(currentView: $currentView, userViewModel: userViewModel, initialContext: context)
         case .albaTest:
             AlbaTestView(currentView: $currentView, viewModel: TestViewModel(userViewModel: userViewModel), userViewModel: userViewModel)
+        case .newTestForFriend(let friendName):
+            let vm = TestViewModel(userViewModel: userViewModel)
+            AlbaTestView(currentView: $currentView, viewModel: vm, userViewModel: userViewModel)
+                .onAppear { vm.setupNewTestForFriend(name: friendName) }
         case .reEvaluate(let friendName, let friendGender):
             let vm = TestViewModel(userViewModel: userViewModel)
             AlbaTestView(currentView: $currentView, viewModel: vm, userViewModel: userViewModel)
@@ -67,9 +71,7 @@ struct ContentView: View {
         case .albaBlocks:
             AlbaBlocksView(currentView: $currentView)
         case .journal:
-            NavigationStack {
-                JournalView(currentView: $currentView)
-            }
+            JournalLockView(currentView: $currentView)
         }
     }
 

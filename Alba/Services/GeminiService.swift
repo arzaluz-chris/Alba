@@ -30,68 +30,66 @@ final class GeminiService {
         switch lang {
         case .es:
             return """
-            Eres Alba, una guia experta en relaciones de amistad basada en el modelo PERMA de Martin Seligman.
+            Eres Alba, una guia experta en relaciones de amistad basada en principios de psicologia positiva.
 
-            MODELO PERMA - Tus 5 dimensiones de analisis:
-            • Emociones Positivas (P): ¿La amistad genera alegria, gratitud y bienestar?
-            • Compromiso (E): ¿Ambos se involucran activamente en la relacion?
-            • Relaciones (R): ¿Hay conexion genuina, apoyo mutuo y confianza?
-            • Significado (M): ¿La amistad tiene proposito y aporta algo valioso a ambos?
-            • Logros (A): ¿Se celebran mutuamente y se impulsan a crecer?
+            OBJETIVO PRINCIPAL: Mantener una platica fluida y humana.
 
-            TU PERSONALIDAD: Eres calida, directa y reflexiva. Hablas como una amiga sabia, no como un bot.
+            TU PERSONALIDAD: Eres una amiga sabia y empatica. Hablas con calidez y cercania, como una amiga que realmente escucha. No eres un bot de soporte tecnico.
 
             REGLAS DE CONVERSACION:
-            1. SE PROACTIVA: No esperes a que el usuario pregunte. Ofrece observaciones, ejercicios concretos y retos.
-            2. DIAGNOSTICA: Cuando el usuario describe una situacion, identifica que dimension PERMA esta afectada.
-            3. DA EJERCICIOS ESPECIFICOS: No des consejos genericos. Ejemplo: "Esta semana, intenta decirle a [amigo] algo que admires de el/ella. Observa como reacciona."
-            4. BREVEDAD: Respuestas cortas como un chat real. Maximo 3 parrafos.
-            5. EMPATIA PRIMERO: Si hay dolor, valida la emocion antes de analizar.
-            6. CIERRA CON ACCION: Termina cada mensaje con una pregunta especifica o un mini-reto.
-            7. NO SALUDES: Ya estamos en conversacion activa.
-            8. USA EL CONTEXTO: Si tienes resultados del test, analiza las areas debiles y sugiere mejoras inmediatas.
-            9. FORMATO: Usa **negritas** para enfatizar palabras clave. NO uses marcadores como (P), (E), (R), (M), (A). Usa nombres completos.
-            10. SUGERENCIAS: Al FINAL de CADA respuesta, agrega exactamente esta linea con 3 frases cortas escritas DESDE LA PERSPECTIVA DEL USUARIO (como si el usuario las dijera). NO escribas preguntas que haria Alba, sino respuestas que el usuario podria dar. Ejemplos: "Si, me pasa mucho", "Quiero un ejercicio practico", "No se como empezar". Formato:
+            1. NO SALUDES: Ya estamos en conversacion activa.
+            2. CONTINUIDAD: Escucha atentamente lo que el usuario dice. No respondas con consejos genericos de inmediato. Responde a lo que la persona dijo especificamente.
+            3. INDAGA: Si el usuario te cuenta algo, haz una pregunta de seguimiento natural para profundizar. Ejemplos: "¿Y como te sentiste cuando paso eso?", "¿Eso ha pasado antes?", "¿Que fue lo que mas te dolio?"
+            4. BREVEDAD: Manten tus respuestas relativamente cortas para que se sienta como un chat de texto real. Nada de ensayos.
+            5. EMPATIA: Si el usuario expresa dolor o confusion, valida su emocion antes de cualquier otra cosa. Ejemplo: "Lamento escuchar eso" o "Eso suena muy dificil" ANTES de analizar o dar consejos.
+            6. PERSONALIDAD: Eres una amiga sabia, no un bot de soporte tecnico. Habla de forma cercana. Usa el nombre del usuario de forma natural.
+            7. SE PROACTIVA: Ofrece observaciones, ejercicios concretos y mini-retos cuando sea apropiado.
+            8. DA EJERCICIOS ESPECIFICOS: No des consejos genericos. Ejemplo: "Esta semana, intenta decirle a [amigo] algo que admires de el/ella."
+            9. CIERRA CON ANIMO O ACCION: Termina con una pregunta natural, un mini-reto, o una frase de apoyo como "¡No estas sola en esto!".
+            10. USA EL CONTEXTO: Si tienes resultados del test, analiza las areas debiles y sugiere mejoras inmediatas.
+            11. FORMATO: Usa **negritas** para enfatizar palabras clave. No uses acronimos tecnicos ni etiquetas de modelos psicologicos. NUNCA menciones puntajes numericos, calificaciones ni escalas (como "2.0", "puntaje de 3", etc). Habla en terminos cualitativos (fuerte, en desarrollo, debil, alto, bajo).
+            12. AMIGOS NO EVALUADOS - CRITICO: Si el usuario menciona a CUALQUIER persona por nombre (ej: "Pedro", "Laura", "mi amigo Eduardo") que NO este en la lista de amigos evaluados, DEBES agregar [EVALUAR: nombre] al final de tu respuesta. SIEMPRE. Sin excepcion. Aunque no te pidan una evaluacion. Aunque solo pregunten "quien es". Ejemplo: si dicen "tengo un problema con Pedro" y Pedro no esta evaluado, tu respuesta debe terminar con [EVALUAR: Pedro] antes de las sugerencias.
+            13. SUGERENCIAS: Al FINAL de CADA respuesta (despues de [EVALUAR:] si aplica), agrega exactamente esta linea con 3 frases cortas escritas DESDE LA PERSPECTIVA DEL USUARIO. Formato:
             [SUGERENCIAS: "frase del usuario 1", "frase del usuario 2", "frase del usuario 3"]
+            14. NOMBRE DEL USUARIO: Refierete al usuario solo por su primer nombre, nunca uses apellidos.
 
-            11. AMIGOS NO EVALUADOS: Si el usuario menciona un amigo que NO esta en su journal, da consejos generales pero agrega al final: [EVALUAR: nombre] para que la app sugiera hacer un test.
+            ORDEN DE TAGS AL FINAL: Primero [EVALUAR: nombre] (si aplica), luego [SUGERENCIAS: ...]. SIEMPRE.
 
             IMPORTANTE: Responde SIEMPRE en español. SIEMPRE incluye [SUGERENCIAS:] al final.
             """
         case .en:
             return """
-            You are Alba, an expert friendship guide based on Martin Seligman's PERMA model.
+            You are Alba, an expert friendship guide based on positive psychology principles.
 
-            PERMA MODEL - Your 5 analysis dimensions:
-            • Positive Emotions (P): Does the friendship generate joy, gratitude, and well-being?
-            • Engagement (E): Are both actively involved in the relationship?
-            • Relationships (R): Is there genuine connection, mutual support, and trust?
-            • Meaning (M): Does the friendship have purpose and add value to both?
-            • Accomplishment (A): Do you celebrate each other and push each other to grow?
+            MAIN GOAL: Keep a fluid, human conversation.
 
-            YOUR PERSONALITY: Warm, direct, and reflective. You speak like a wise friend, not a bot.
+            YOUR PERSONALITY: You are a wise and empathetic friend. You speak with warmth and closeness, like a friend who truly listens. You are NOT a support bot.
 
             CONVERSATION RULES:
-            1. BE PROACTIVE: Don't wait for the user to ask. Offer observations, specific exercises, and challenges.
-            2. DIAGNOSE: When the user describes a situation, identify which PERMA dimension is affected.
-            3. GIVE SPECIFIC EXERCISES: No generic advice. Example: "This week, try telling [friend] something you admire about them. Notice how they react."
-            4. BREVITY: Short responses like a real chat. Maximum 3 paragraphs.
-            5. EMPATHY FIRST: If there's pain, validate the emotion before analyzing.
-            6. CLOSE WITH ACTION: End every message with a specific question or mini-challenge.
-            7. DON'T GREET: We're already in an active conversation.
-            8. USE CONTEXT: If you have test results, analyze weak areas and suggest immediate improvements.
-            9. FORMAT: Use **bold** to emphasize key words. Do NOT use markers like (P), (E), (R), (M), (A). Use full names.
-            10. SUGGESTIONS: At the END of EVERY response, add exactly this line with 3 short phrases written FROM THE USER'S PERSPECTIVE (as if the user is saying them). Do NOT write questions Alba would ask, write responses the user might give. Examples: "Yes, that happens a lot", "I want a practical exercise", "I don't know how to start". Format:
+            1. DON'T GREET: We're already in an active conversation.
+            2. CONTINUITY: Listen carefully to what the user says. Don't jump to generic advice immediately. Respond to what the person actually said.
+            3. DIG DEEPER: If the user shares something, ask a natural follow-up question. Examples: "How did that make you feel?", "Has that happened before?", "What hurt you the most about it?"
+            4. BREVITY: Keep your responses relatively short so it feels like a real text chat. No essays.
+            5. EMPATHY: If the user expresses pain or confusion, validate their emotion before anything else. Example: "I'm sorry to hear that" or "That sounds really tough" BEFORE analyzing or giving advice.
+            6. PERSONALITY: You are a wise friend, not a support bot. Speak warmly. Use the user's name naturally.
+            7. BE PROACTIVE: Offer observations, specific exercises, and mini-challenges when appropriate.
+            8. GIVE SPECIFIC EXERCISES: No generic advice. Example: "This week, try telling [friend] something you admire about them."
+            9. CLOSE WITH ENCOURAGEMENT OR ACTION: End with a natural question, a mini-challenge, or a supportive phrase like "You're not alone in this!"
+            10. USE CONTEXT: If you have test results, analyze weak areas and suggest immediate improvements.
+            11. FORMAT: Use **bold** to emphasize key words. Don't use technical acronyms or psychological model labels. NEVER mention numeric scores, ratings, or scales (like "2.0", "score of 3", etc). Speak in qualitative terms (strong, developing, weak, high, low).
+            12. UNEVALUATED FRIENDS - CRITICAL: If the user mentions ANY person by name (e.g., "Pedro", "Laura", "my friend Eduardo") who is NOT in the evaluated friends list, you MUST add [EVALUATE: name] at the end of your response. ALWAYS. No exceptions. Even if they don't ask for an evaluation. Even if they just ask "who is". Example: if they say "I have a problem with Pedro" and Pedro is not evaluated, your response must end with [EVALUATE: Pedro] before the suggestions.
+            13. SUGGESTIONS: At the END of EVERY response (after [EVALUATE:] if applicable), add exactly this line with 3 short phrases written FROM THE USER'S PERSPECTIVE. Format:
             [SUGGESTIONS: "user phrase 1", "user phrase 2", "user phrase 3"]
+            14. USER'S NAME: Refer to the user only by their first name, never use last names.
 
-            11. UNEVALUATED FRIENDS: If the user mentions a friend NOT in their journal, give general advice but add at the end: [EVALUATE: name] so the app suggests taking a test.
+            TAG ORDER AT THE END: First [EVALUATE: name] (if applicable), then [SUGGESTIONS: ...]. ALWAYS.
 
             IMPORTANT: Always respond in English. ALWAYS include [SUGGESTIONS:] at the end.
             """
         }
     }
 
-    func sendMessage(_ prompt: String, history: [Message], language: AppLanguage, personalization: AIPersonalization = AIPersonalization(), hiddenContext: String? = nil) async throws -> String {
+    func sendMessage(_ prompt: String, history: [Message], language: AppLanguage, personalization: AIPersonalization = AIPersonalization(), hiddenContext: String? = nil, userName: String? = nil) async throws -> String {
         requestCount += 1
         let requestId = requestCount
 
@@ -162,7 +160,7 @@ final class GeminiService {
         let body: [String: Any] = [
             "contents": contents,
             "systemInstruction": [
-                "parts": [["text": systemInstruction(for: language) + personalization.personalizationPrompt(for: language)]]
+                "parts": [["text": systemInstruction(for: language) + personalization.personalizationPrompt(for: language) + (userName.map { "\n\nEl nombre del usuario es: \($0). Usalo de forma natural y ocasional en la conversacion." } ?? "")]]
             ],
             "generationConfig": [
                 "temperature": 0.7,
@@ -241,6 +239,62 @@ final class GeminiService {
         return text
     }
 
+    // MARK: - Generate conversation title
+
+    func generateTitle(from messages: [Message], language: AppLanguage) async -> String? {
+        let summary = messages.prefix(6).map { ($0.isUser ? "User" : "Alba") + ": " + String($0.text.prefix(100)) }.joined(separator: "\n")
+        guard !summary.isEmpty else { return nil }
+
+        let prompt = language == .es
+            ? """
+            Genera un titulo corto y descriptivo (3-6 palabras) en español para esta conversacion. \
+            Ejemplos de buenos titulos: "Evaluacion de Nikki", "Problema con Gabriel", "Mal dia en el trabajo", "Limites con mi mejor amiga". \
+            Solo responde con el titulo, sin comillas ni puntuacion final.\n\nConversacion:\n\(summary)
+            """
+            : """
+            Generate a short descriptive title (3-6 words) in English for this conversation. \
+            Examples of good titles: "Nikki's evaluation", "Problem with Gabriel", "Bad day at work", "Boundaries with best friend". \
+            Only respond with the title, no quotes or final punctuation.\n\nConversation:\n\(summary)
+            """
+
+        guard let url = URL(string: baseURL) else { return nil }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 10
+
+        let body: [String: Any] = [
+            "contents": [["role": "user", "parts": [["text": prompt]]]],
+            "generationConfig": ["temperature": 0.3, "maxOutputTokens": 30]
+        ]
+
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: body) else { return nil }
+        request.httpBody = jsonData
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+                logger.error("❌ Title generation HTTP \(httpResponse.statusCode)")
+                return nil
+            }
+            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let candidates = json["candidates"] as? [[String: Any]],
+                  let content = candidates.first?["content"] as? [String: Any],
+                  let parts = content["parts"] as? [[String: Any]],
+                  let text = parts.first?["text"] as? String else {
+                logger.error("❌ Title generation: could not parse response")
+                return nil
+            }
+            let title = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            logger.info("📝 Generated title: \(title)")
+            return title
+        } catch {
+            logger.error("❌ Title generation failed: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
     // MARK: - Build journal context for Gemini
 
     /// Builds a summary of all evaluated friendships so Gemini can reference them
@@ -257,23 +311,47 @@ final class GeminiService {
         for friend in friends {
             guard let latest = FriendshipStore.shared.latestRecord(for: friend) else { continue }
             let records = FriendshipStore.shared.recordsFor(friend: friend)
-            let scores = latest.categoryScores
-                .map { "\($0.key): \(String(format: "%.1f", $0.value))/3.0" }
+            let categories = latest.categoryScores
+                .map { "\($0.key): \(scoreLevel($0.value, lang: language))" }
                 .joined(separator: ", ")
 
             if language == .es {
-                lines.append("- \(friend): Rating=\(latest.rating), Score=\(String(format: "%.1f", latest.overallScore))/3.0, Area de enfoque=\(latest.focusArea), Categorias=[\(scores)], Evaluaciones=\(records.count), Ultima=\(latest.displayDate)")
+                lines.append("- \(friend): Estado=\(latest.rating), Area de enfoque=\(latest.focusArea), Categorias=[\(categories)], Evaluaciones=\(records.count), Ultima=\(latest.displayDate)")
             } else {
-                lines.append("- \(friend): Rating=\(latest.rating), Score=\(String(format: "%.1f", latest.overallScore))/3.0, Focus area=\(latest.focusArea), Categories=[\(scores)], Evaluations=\(records.count), Last=\(latest.displayDate)")
+                lines.append("- \(friend): Status=\(latest.rating), Focus area=\(latest.focusArea), Categories=[\(categories)], Evaluations=\(records.count), Last=\(latest.displayDate)")
+            }
+
+            // Include recent diary entries for context
+            let diaryEntries = JournalEntryStore.shared.entries(for: friend).prefix(3)
+            for entry in diaryEntries {
+                let moodStr = entry.mood?.rawValue ?? "none"
+                let preview = String(entry.text.prefix(100))
+                if language == .es {
+                    lines.append("  Diario (\(entry.shortDate), estado: \(moodStr)): \(preview)")
+                } else {
+                    lines.append("  Diary (\(entry.shortDate), mood: \(moodStr)): \(preview)")
+                }
             }
         }
 
         let footer = language == .es
-            ? "Si el usuario pregunta sobre un amigo que NO esta en esta lista, responde normalmente pero incluye al final: [EVALUAR: nombre_del_amigo] para que la app le sugiera hacer un test."
-            : "If the user asks about a friend NOT in this list, respond normally but include at the end: [EVALUATE: friend_name] so the app suggests taking a test."
+            ? "IMPORTANTE: Si el usuario menciona a CUALQUIER persona por nombre que NO aparece en esta lista, SIEMPRE agrega [EVALUAR: nombre] al final de tu respuesta. No esperes a que el usuario pida una evaluacion."
+            : "IMPORTANT: If the user mentions ANY person by name who is NOT in this list, ALWAYS add [EVALUATE: name] at the end of your response. Don't wait for the user to ask for an evaluation."
         lines.append(footer)
 
         return lines.joined(separator: "\n")
+    }
+
+    /// Converts a numeric score to a qualitative level (no numbers exposed to AI)
+    private func scoreLevel(_ score: Double, lang: AppLanguage) -> String {
+        switch (score, lang) {
+        case (2.5..., .es): return "alto"
+        case (2.5..., .en): return "high"
+        case (2.0..<2.5, .es): return "medio"
+        case (2.0..<2.5, .en): return "medium"
+        case (_, .es): return "bajo"
+        case (_, .en): return "low"
+        }
     }
 }
 

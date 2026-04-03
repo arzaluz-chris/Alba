@@ -10,6 +10,7 @@ struct SavedConversation: Codable, Identifiable {
     let date: Date
     let messages: [SavedMessage]
     let language: String
+    var title: String?
 
     var displayDate: String {
         let formatter = DateFormatter()
@@ -20,6 +21,10 @@ struct SavedConversation: Codable, Identifiable {
 
     var preview: String {
         messages.last(where: { !$0.isUser })?.text.prefix(80).description ?? ""
+    }
+
+    var displayTitle: String {
+        title ?? displayDate
     }
 }
 
@@ -42,16 +47,20 @@ final class ConversationStore {
 
     /// Save or update a conversation by its ID (one entry per chat session)
     func saveConversation(id: UUID, messages: [Message], language: AppLanguage) {
-        guard messages.count > 1 else { return }
+        guard !messages.isEmpty else { return }
+
+        var existing = loadAllConversations()
+
+        // Preserve existing title if updating
+        let existingTitle = existing.first(where: { $0.id == id })?.title
 
         let saved = SavedConversation(
             id: id,
             date: Date(),
             messages: messages.map { SavedMessage(text: $0.text, isUser: $0.isUser, timestamp: $0.date) },
-            language: language.rawValue
+            language: language.rawValue,
+            title: existingTitle
         )
-
-        var existing = loadAllConversations()
 
         // Update existing conversation or insert new one
         if let idx = existing.firstIndex(where: { $0.id == id }) {
@@ -99,6 +108,20 @@ final class ConversationStore {
             logger.info("🗑️ Deleted conversation \(id)")
         } catch {
             logger.error("❌ Failed to delete conversation: \(error.localizedDescription)")
+        }
+    }
+
+    func updateTitle(id: UUID, title: String) {
+        var conversations = loadAllConversations()
+        if let idx = conversations.firstIndex(where: { $0.id == id }) {
+            conversations[idx].title = title
+            do {
+                let data = try JSONEncoder().encode(conversations)
+                try data.write(to: fileURL)
+                logger.info("📝 Updated title for \(id): \(title)")
+            } catch {
+                logger.error("❌ Failed to update title: \(error.localizedDescription)")
+            }
         }
     }
 

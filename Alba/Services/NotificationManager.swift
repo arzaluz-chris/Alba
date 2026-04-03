@@ -12,7 +12,7 @@ final class NotificationManager {
             if granted {
                 logger.info("✅ Notification permission granted")
                 self.scheduleWeeklyReminder()
-                self.schedulePERMATip()
+                self.scheduleFriendshipTip()
             } else {
                 logger.info("❌ Notification permission denied: \(error?.localizedDescription ?? "none")")
             }
@@ -72,14 +72,14 @@ final class NotificationManager {
         }
     }
 
-    func schedulePERMATip() {
+    func scheduleFriendshipTip() {
         let tips = [
-            ("es", "Tip PERMA: Las emociones positivas fortalecen los vinculos. Hoy, comparte algo que te hizo sonreir con un amigo."),
-            ("en", "PERMA Tip: Positive emotions strengthen bonds. Today, share something that made you smile with a friend."),
-            ("es", "Tip PERMA: El compromiso mutuo es clave. ¿Cuando fue la ultima vez que hiciste algo especial por un amigo?"),
-            ("en", "PERMA Tip: Mutual engagement is key. When was the last time you did something special for a friend?"),
-            ("es", "Tip PERMA: Los limites sanos protegen las amistades. Recuerda: decir 'no' tambien es cuidar la relacion."),
-            ("en", "PERMA Tip: Healthy boundaries protect friendships. Remember: saying 'no' is also caring for the relationship."),
+            ("es", "Tip Alba: Las emociones positivas fortalecen los vinculos. Hoy, comparte algo que te hizo sonreir con un amigo."),
+            ("en", "Alba Tip: Positive emotions strengthen bonds. Today, share something that made you smile with a friend."),
+            ("es", "Tip Alba: El compromiso mutuo es clave. ¿Cuando fue la ultima vez que hiciste algo especial por un amigo?"),
+            ("en", "Alba Tip: Mutual engagement is key. When was the last time you did something special for a friend?"),
+            ("es", "Tip Alba: Los limites sanos protegen las amistades. Recuerda: decir 'no' tambien es cuidar la relacion."),
+            ("en", "Alba Tip: Healthy boundaries protect friendships. Remember: saying 'no' is also caring for the relationship."),
         ]
 
         let isSpanish = Locale.current.language.languageCode?.identifier.hasPrefix("es") == true
@@ -100,7 +100,7 @@ final class NotificationManager {
             let request = UNNotificationRequest(identifier: "alba_tip_\(index)", content: content, trigger: trigger)
             UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
         }
-        logger.info("📅 PERMA tips scheduled")
+        logger.info("📅 Friendship tips scheduled")
     }
 
     func cancelAll() {

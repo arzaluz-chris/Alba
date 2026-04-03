@@ -130,7 +130,9 @@ struct HomeView: View {
             tutorialManager.startIfFirstTime()
         }
         .sheet(isPresented: $showSettings) {
-            SettingsView()
+            SettingsView(onDeleteAccount: {
+                currentView = .splash
+            })
         }
     }
 }

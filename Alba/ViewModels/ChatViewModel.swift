@@ -16,6 +16,7 @@ final class ChatViewModel: ObservableObject {
     private let rateLimiter = RateLimiter.shared
     private var hiddenContext: String?
     private(set) var conversationId: UUID
+    private var hasGeneratedTitle: Bool = false
     var language: AppLanguage = .es
 
     private static let conversationIdKey = "alba_current_conversation_id"
@@ -68,8 +69,8 @@ final class ChatViewModel: ObservableObject {
 
             callGemini(
                 prompt: language == .es
-                    ? "Analiza estos resultados usando el modelo PERMA. Dame un análisis breve y un ejercicio concreto."
-                    : "Analyze these results using the PERMA model. Give a brief analysis and a concrete exercise.",
+                    ? "Analiza estos resultados. Dame un análisis breve y un ejercicio concreto."
+                    : "Analyze these results. Give a brief analysis and a concrete exercise.",
                 history: [],
                 hiddenContext: context
             )
@@ -139,7 +140,8 @@ final class ChatViewModel: ObservableObject {
                 let rawResponse = try await geminiService.sendMessage(
                     prompt, history: history, language: language,
                     personalization: userViewModel.aiPersonalization,
-                    hiddenContext: hiddenContext
+                    hiddenContext: hiddenContext,
+                    userName: userViewModel.userName
                 )
                 rateLimiter.recordMessage()
                 limitReached = rateLimiter.isLimitReached
@@ -150,16 +152,23 @@ final class ChatViewModel: ObservableObject {
 
                 withAnimation(.spring(response: 0.4)) {
                     if let friendName = evaluateFriend {
-                        // Alba's message + embedded test prompt
+                        // Only show test card if friend is NOT already evaluated
+                        let alreadyEvaluated = FriendshipStore.shared.uniqueFriends().contains(where: {
+                            $0.lowercased() == friendName.lowercased()
+                        })
+
                         messages.append(Message(text: cleanText, isUser: false))
-                        var testMsg = Message(
-                            text: language == .es
-                                ? "¿Quieres evaluar tu amistad con \(friendName)? Haz el Alba Test para obtener un análisis PERMA completo."
-                                : "Want to evaluate your friendship with \(friendName)? Take the Alba Test for a full PERMA analysis.",
-                            isUser: false
-                        )
-                        testMsg.action = .takeTest(friendName: friendName)
-                        messages.append(testMsg)
+
+                        if !alreadyEvaluated {
+                            var testMsg = Message(
+                                text: language == .es
+                                    ? "¿Quieres evaluar tu amistad con \(friendName)? Haz el Alba Test para obtener un análisis completo."
+                                    : "Want to evaluate your friendship with \(friendName)? Take the Alba Test for a full analysis.",
+                                isUser: false
+                            )
+                            testMsg.action = .takeTest(friendName: friendName)
+                            messages.append(testMsg)
+                        }
                     } else {
                         messages.append(Message(text: cleanText, isUser: false))
                     }
@@ -171,6 +180,16 @@ final class ChatViewModel: ObservableObject {
 
                 saveCurrentConversation()
                 smartSuggestions = suggestions
+
+                // Auto-generate title after first meaningful exchange (at least 2 messages total)
+                if !hasGeneratedTitle && messages.count >= 2 {
+                    hasGeneratedTitle = true
+                    Task {
+                        if let title = await geminiService.generateTitle(from: messages, language: language) {
+                            ConversationStore.shared.updateTitle(id: conversationId, title: title)
+                        }
+                    }
+                }
 
             } catch GeminiError.rateLimited {
                 logger.error("⚠️ Gemini rate limited")

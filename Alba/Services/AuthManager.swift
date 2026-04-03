@@ -42,10 +42,15 @@ final class AuthManager: ObservableObject {
         let userIdentifier = credential.user
         KeychainHelper.save(key: userIdKey, value: userIdentifier)
 
-        // Save name (only available on first authorization)
-        if let givenName = credential.fullName?.givenName {
+        // Save name (only available on FIRST authorization - Apple won't send it again)
+        if let givenName = credential.fullName?.givenName, !givenName.isEmpty {
             UserDefaults.standard.set(givenName, forKey: "appleUserGivenName")
+            KeychainHelper.save(key: "appleGivenName", value: givenName)
             appleUserName = givenName
+        } else if let savedName = KeychainHelper.load(key: "appleGivenName") {
+            // Fallback: Apple didn't send name (re-auth), but we have it in Keychain
+            UserDefaults.standard.set(savedName, forKey: "appleUserGivenName")
+            appleUserName = savedName
         }
 
         if let familyName = credential.fullName?.familyName {

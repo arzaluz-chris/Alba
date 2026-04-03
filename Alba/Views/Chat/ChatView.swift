@@ -74,10 +74,25 @@ struct ChatView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(spacing: 12) {
+                            if viewModel.messages.isEmpty && !viewModel.isTyping {
+                                VStack(spacing: 16) {
+                                    Spacer().frame(height: 60)
+                                    AlbaAvatar(size: 64)
+                                    Text(lang == .es
+                                         ? "Hola, \(userViewModel.userName). ¿En qué te puedo ayudar hoy?"
+                                         : "Hi, \(userViewModel.userName). How can I help you today?")
+                                        .font(AlbaFont.rounded(16, weight: .medium))
+                                        .foregroundColor(.gray)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 40)
+                                }
+                                .frame(maxWidth: .infinity)
+                            }
+
                             ForEach(viewModel.messages) { message in
                                 ChatBubble(message: message) { friendName in
                                     viewModel.saveCurrentConversation()
-                                    currentView = .albaTest
+                                    currentView = .newTestForFriend(friendName: friendName)
                                 }
                                 .id(message.id)
                             }
@@ -162,18 +177,13 @@ struct ChatView: View {
             }
         }
         .onAppear {
+            viewModel.language = lang
             if !userViewModel.hasCompletedAIOnboarding {
                 showAIOnboarding = true
+                // Don't call Gemini until onboarding is done
+                return
             }
-            viewModel.language = lang
-            if viewModel.messages.isEmpty {
-                // Try to resume the current conversation from disk
-                if initialContext == nil, let saved = ConversationStore.shared.loadAllConversations().first(where: { $0.id == viewModel.conversationId }) {
-                    viewModel.loadConversation(saved)
-                } else {
-                    viewModel.setInitialMessage(userName: userViewModel.userName, context: initialContext)
-                }
-            }
+            initializeChatIfNeeded()
         }
         .onChange(of: languageManager.language) {
             viewModel.language = languageManager.language
@@ -181,7 +191,10 @@ struct ChatView: View {
         .sheet(isPresented: $showHistory) {
             ChatHistoryView(viewModel: viewModel)
         }
-        .fullScreenCover(isPresented: $showAIOnboarding) {
+        .fullScreenCover(isPresented: $showAIOnboarding, onDismiss: {
+            // After onboarding completes, now initialize chat with user's chosen style
+            initializeChatIfNeeded()
+        }) {
             AlbaAIOnboardingView()
         }
     }
@@ -197,6 +210,19 @@ struct ChatView: View {
             proxy.scrollTo("bottom", anchor: .bottom)
         }
     }
+
+    private func initializeChatIfNeeded() {
+        guard viewModel.messages.isEmpty else { return }
+
+        if let context = initialContext {
+            // Coming from test results - always start a fresh conversation
+            viewModel.startNewConversation()
+            viewModel.setInitialMessage(userName: userViewModel.userName, context: context)
+        } else {
+            // Regular chat - start fresh and empty. User can load history manually.
+            viewModel.startNewConversation()
+        }
+    }
 }
 
 // MARK: - Chat History View
@@ -206,6 +232,9 @@ struct ChatHistoryView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var conversations: [SavedConversation] = []
+    @State private var renameConvoId: UUID? = nil
+    @State private var renameText: String = ""
+    @State private var showRenameAlert: Bool = false
 
     private var lang: AppLanguage { languageManager.language }
 
@@ -252,32 +281,48 @@ struct ChatHistoryView: View {
                 } else {
                     List {
                         ForEach(conversations) { convo in
-                            Button {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(convo.displayTitle)
+                                    .font(AlbaFont.rounded(14, weight: .bold))
+                                    .foregroundColor(.albaText)
+                                    .lineLimit(1)
+                                Text(cleanPreview(convo.preview))
+                                    .font(AlbaFont.rounded(13))
+                                    .foregroundColor(.gray)
+                                    .lineLimit(2)
+                                HStack {
+                                    Text(convo.displayDate)
+                                        .font(AlbaFont.rounded(11))
+                                        .foregroundColor(.albaAccent.opacity(0.7))
+                                    Spacer()
+                                    Text(lang == .es
+                                         ? "\(convo.messages.count) msgs"
+                                         : "\(convo.messages.count) msgs")
+                                        .font(AlbaFont.rounded(11))
+                                        .foregroundColor(.gray.opacity(0.6))
+                                }
+                            }
+                            .padding(.vertical, 4)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
                                 viewModel.loadConversation(convo)
                                 dismiss()
-                            } label: {
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text(convo.displayDate)
-                                        .font(AlbaFont.rounded(13, weight: .semibold))
-                                        .foregroundColor(.albaAccent)
-                                    Text(convo.preview)
-                                        .font(AlbaFont.rounded(14))
-                                        .foregroundColor(.albaText)
-                                        .lineLimit(2)
-                                    Text(lang == .es
-                                         ? "\(convo.messages.count) mensajes"
-                                         : "\(convo.messages.count) messages")
-                                        .font(AlbaFont.rounded(12))
-                                        .foregroundColor(.gray)
+                            }
+                            .contextMenu {
+                                Button {
+                                    renameConvoId = convo.id
+                                    renameText = convo.title ?? ""
+                                    showRenameAlert = true
+                                } label: {
+                                    Label(lang == .es ? "Renombrar" : "Rename", systemImage: "pencil")
                                 }
-                                .padding(.vertical, 4)
+                                Button(role: .destructive) {
+                                    ConversationStore.shared.deleteConversation(id: convo.id)
+                                    conversations = ConversationStore.shared.loadAllConversations()
+                                } label: {
+                                    Label(lang == .es ? "Eliminar" : "Delete", systemImage: "trash")
+                                }
                             }
-                        }
-                        .onDelete { indexSet in
-                            for index in indexSet {
-                                ConversationStore.shared.deleteConversation(id: conversations[index].id)
-                            }
-                            conversations.remove(atOffsets: indexSet)
                         }
                     }
                     .scrollContentBackground(.hidden)
@@ -287,6 +332,20 @@ struct ChatHistoryView: View {
             .onAppear {
                 conversations = ConversationStore.shared.loadAllConversations()
             }
+            .alert(lang == .es ? "Renombrar conversación" : "Rename conversation", isPresented: $showRenameAlert) {
+                TextField(lang == .es ? "Nombre" : "Title", text: $renameText)
+                Button(lang == .es ? "Guardar" : "Save") {
+                    if let id = renameConvoId, !renameText.isEmpty {
+                        ConversationStore.shared.updateTitle(id: id, title: renameText)
+                        conversations = ConversationStore.shared.loadAllConversations()
+                    }
+                }
+                Button(lang == .es ? "Cancelar" : "Cancel", role: .cancel) {}
+            }
         }
+    }
+
+    private func cleanPreview(_ text: String) -> String {
+        text.replacingOccurrences(of: "**", with: "")
     }
 }

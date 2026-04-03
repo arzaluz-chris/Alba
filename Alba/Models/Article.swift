@@ -32,10 +32,10 @@ struct AlbaBlocksData {
             resourceBaseName: "Articulo_EstudioRevelador"
         ),
         Article(
-            titleEs: "¿Que es PERMA?",
-            titleEn: "What is PERMA?",
-            teaserEs: "Los 5 pilares del bienestar: emociones, compromiso, relaciones, sentido y logros.",
-            teaserEn: "The five pillars of well-being: emotions, engagement, relationships, meaning, and accomplishment.",
+            titleEs: "Psicología positiva y las amistades",
+            titleEn: "Positive Psychology & Friendships",
+            teaserEs: "Cómo la ciencia del bienestar nos ayuda a construir amistades más sanas.",
+            teaserEn: "How the science of well-being helps us build healthier friendships.",
             coverImageName: "permaCover",
             resourceBaseName: "Articulo_PERMA"
         )

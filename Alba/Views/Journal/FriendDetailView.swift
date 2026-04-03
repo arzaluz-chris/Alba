@@ -10,7 +10,7 @@ struct FriendDetailView: View {
     private var lang: AppLanguage { languageManager.language }
     private var latest: FriendshipRecord? { records.first }
 
-    private let permaCategories: [(key: String, labelEs: String, labelEn: String, icon: String)] = [
+    private let analysisCategories: [(key: String, labelEs: String, labelEn: String, icon: String)] = [
         ("support", "Apoyo", "Support", "hand.raised.fill"),
         ("trust", "Confianza", "Trust", "lock.shield.fill"),
         ("limits", "Límites", "Boundaries", "hand.raised.slash.fill"),
@@ -140,13 +140,13 @@ struct FriendDetailView: View {
                         .padding(.horizontal, 20)
                     }
 
-                    // PERMA Chart
+                    // Analysis Chart
                     VStack(alignment: .leading, spacing: 14) {
-                        Text("PERMA")
+                        Text(lang == .es ? "Análisis" : "Analysis")
                             .font(AlbaFont.serif(20, weight: .bold))
                             .foregroundColor(.albaText)
 
-                        ForEach(permaCategories, id: \.key) { cat in
+                        ForEach(analysisCategories, id: \.key) { cat in
                             let score = latest?.categoryScores[cat.key] ?? 0
                             let trend = FriendshipStore.shared.trend(for: friendName, category: cat.key)
 
@@ -159,7 +159,7 @@ struct FriendDetailView: View {
                                 Text(lang == .es ? cat.labelEs : cat.labelEn)
                                     .font(AlbaFont.rounded(14, weight: .medium))
                                     .foregroundColor(.albaText)
-                                    .frame(width: 90, alignment: .leading)
+                                    .frame(width: 105, alignment: .leading)
 
                                 GeometryReader { geo in
                                     ZStack(alignment: .leading) {
@@ -171,11 +171,6 @@ struct FriendDetailView: View {
                                     }
                                 }
                                 .frame(height: 12)
-
-                                Text(String(format: "%.1f", score))
-                                    .font(AlbaFont.rounded(13, weight: .bold))
-                                    .foregroundColor(.albaText)
-                                    .frame(width: 30)
 
                                 if let trend {
                                     Image(systemName: trend > 0 ? "arrow.up.circle.fill" : (trend < 0 ? "arrow.down.circle.fill" : "minus.circle.fill"))
@@ -208,13 +203,10 @@ struct FriendDetailView: View {
                                     Text(record.displayDate)
                                         .font(AlbaFont.rounded(14, weight: .medium))
                                         .foregroundColor(.albaText)
-                                    Text(record.rating)
-                                        .font(AlbaFont.rounded(12))
-                                        .foregroundColor(.gray)
                                 }
                                 Spacer()
-                                Text(String(format: "%.1f", record.overallScore))
-                                    .font(AlbaFont.rounded(18, weight: .bold))
+                                Text(record.rating)
+                                    .font(AlbaFont.rounded(13, weight: .semibold))
                                     .foregroundColor(ratingColor(record.overallScore))
                             }
                             .padding(12)
@@ -228,6 +220,10 @@ struct FriendDetailView: View {
                     .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color.white.opacity(0.3), lineWidth: 0.8))
                     .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
                     .padding(.horizontal, 20)
+
+                    // Diary Section
+                    DiarySection(friendName: friendName)
+                        .padding(.horizontal, 20)
 
                     Spacer().frame(height: 30)
                 }

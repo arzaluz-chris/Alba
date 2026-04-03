@@ -179,6 +179,7 @@ struct AlbaTestView: View {
                     : L10n.t(.nextQuestion, lang)
 
                 GlassActionButton(buttonTitle, icon: viewModel.isLastQuestion ? "star.fill" : "arrow.right", style: .primary) {
+                    guard viewModel.isAnswerSelected else { return }
                     if viewModel.isLastQuestion {
                         let result = viewModel.calculateResult()
                         testResult = result
@@ -193,6 +194,7 @@ struct AlbaTestView: View {
                 }
                 .opacity(viewModel.isAnswerSelected ? 1 : 0.4)
                 .disabled(!viewModel.isAnswerSelected)
+                .allowsHitTesting(viewModel.isAnswerSelected)
             }
             .padding(.horizontal, 28)
             .padding(.bottom, 40)

@@ -71,6 +71,18 @@ final class FriendshipStore {
         return Calendar.current.dateComponents([.day], from: latest.date, to: Date()).day
     }
 
+    func deleteFriend(name: String) {
+        var all = loadAll()
+        all.removeAll { $0.friendName.lowercased() == name.lowercased() }
+        do {
+            let data = try JSONEncoder().encode(all)
+            try data.write(to: fileURL)
+            logger.info("🗑️ Deleted all records for \(name)")
+        } catch {
+            logger.error("❌ Failed to delete friend: \(error.localizedDescription)")
+        }
+    }
+
     func deleteAll() {
         try? FileManager.default.removeItem(at: fileURL)
         logger.info("🗑️ All records deleted")

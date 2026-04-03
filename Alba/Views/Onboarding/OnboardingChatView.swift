@@ -274,28 +274,19 @@ struct OnboardingChatView: View {
         // Step 0: Greeting
         showTyping()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             hideTypingAndAdd(isES ? "¡Hola! Soy Alba 👋" : "Hi! I'm Alba 👋")
         }
 
-        // Step 1: "Before we begin..."
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+        // Step 1: Ask gender (combined with intro)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
             showTyping()
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
             hideTypingAndAdd(isES
-                ? "Antes de comenzar, necesito saber unas cosas..."
-                : "Before we start, I need to know a few things...")
-        }
-
-        // Step 2: Ask gender
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.5) {
-            showTyping()
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 7.0) {
-            hideTypingAndAdd(isES ? "¿Cómo te identificas?" : "How do you identify?")
+                ? "Antes de comenzar, ¿cómo te identificas?"
+                : "Before we start, how do you identify?")
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
@@ -318,17 +309,51 @@ struct OnboardingChatView: View {
             messages.append((label, true))
         }
 
-        // Alba responds and asks name
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-            showTyping()
-        }
+        // Check if we already have the name from Apple Sign In or from prior auth
+        let appleName = UserDefaults.standard.string(forKey: "appleUserGivenName")
+            ?? UserDefaults.standard.string(forKey: "appleUserName")
+        if let appleName, !appleName.isEmpty {
+            // Pre-fill name and skip the name question
+            userViewModel.userName = appleName
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            hideTypingAndAdd(isES ? "¡Genial! ¿Y cómo te llamas?" : "Great! And what's your name?")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                showTyping()
+            }
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                    showNameInput = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                hideTypingAndAdd(isES
+                    ? "Mucho gusto, \(appleName) ✨"
+                    : "Nice to meet you, \(appleName) ✨")
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                showTyping()
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.8) {
+                hideTypingAndAdd(isES
+                    ? "Estoy lista para ayudarte. ¿Empezamos?"
+                    : "I'm ready to help you. Shall we begin?")
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                        showStartButton = true
+                    }
+                }
+            }
+        } else {
+            // No Apple name - ask for name
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                showTyping()
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                hideTypingAndAdd(isES ? "¡Genial! ¿Y cómo te llamas?" : "Great! And what's your name?")
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                        showNameInput = true
+                    }
                 }
             }
         }
@@ -347,27 +372,27 @@ struct OnboardingChatView: View {
         }
 
         // Alba responds with greeting
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             showTyping()
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
             hideTypingAndAdd(isES
                 ? "Mucho gusto, \(userViewModel.userName) ✨"
                 : "Nice to meet you, \(userViewModel.userName) ✨")
         }
 
         // Final message
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             showTyping()
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.8) {
             hideTypingAndAdd(isES
                 ? "Estoy lista para ayudarte. ¿Empezamos?"
                 : "I'm ready to help you. Shall we begin?")
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                     showStartButton = true
                 }

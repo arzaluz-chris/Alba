@@ -9,6 +9,7 @@ enum AppState: Equatable {
     case welcome
     case chat(initialContext: String? = nil)
     case albaTest
+    case newTestForFriend(friendName: String)
     case reEvaluate(friendName: String, friendGender: Gender)
     case albaBlocks
     case journal

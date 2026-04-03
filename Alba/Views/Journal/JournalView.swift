@@ -6,6 +6,8 @@ struct JournalView: View {
 
     @State private var records: [FriendshipRecord] = []
     @State private var uniqueFriends: [String] = []
+    @State private var friendToDelete: String? = nil
+    @State private var showDeleteConfirm: Bool = false
 
     private var lang: AppLanguage { languageManager.language }
 
@@ -64,6 +66,14 @@ struct JournalView: View {
                                     friendCard(friend)
                                 }
                                 .buttonStyle(.plain)
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        friendToDelete = friend
+                                        showDeleteConfirm = true
+                                    } label: {
+                                        Label(lang == .es ? "Eliminar amistad" : "Delete friendship", systemImage: "trash")
+                                    }
+                                }
                             }
                         }
                         .padding(.horizontal, 20)
@@ -76,6 +86,30 @@ struct JournalView: View {
         .onAppear {
             records = FriendshipStore.shared.loadAll()
             uniqueFriends = FriendshipStore.shared.uniqueFriends()
+        }
+        .alert(
+            lang == .es ? "¿Eliminar amistad?" : "Delete friendship?",
+            isPresented: $showDeleteConfirm
+        ) {
+            Button(lang == .es ? "Cancelar" : "Cancel", role: .cancel) {
+                friendToDelete = nil
+            }
+            Button(lang == .es ? "Eliminar" : "Delete", role: .destructive) {
+                if let name = friendToDelete {
+                    FriendshipStore.shared.deleteFriend(name: name)
+                    JournalEntryStore.shared.entries(for: name).forEach {
+                        JournalEntryStore.shared.delete(entryId: $0.id)
+                    }
+                    HapticManager.shared.notification(.warning)
+                    uniqueFriends = FriendshipStore.shared.uniqueFriends()
+                    records = FriendshipStore.shared.loadAll()
+                    friendToDelete = nil
+                }
+            }
+        } message: {
+            Text(lang == .es
+                 ? "Se eliminarán todas las evaluaciones y entradas de diario de \(friendToDelete ?? ""). Esta acción no se puede deshacer."
+                 : "All evaluations and diary entries for \(friendToDelete ?? "") will be deleted. This action cannot be undone.")
         }
     }
 
@@ -114,15 +148,18 @@ struct JournalView: View {
 
             // Rating badge
             if let latest {
-                VStack(spacing: 4) {
-                    Text(String(format: "%.1f", latest.overallScore))
-                        .font(AlbaFont.rounded(20, weight: .bold))
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text(latest.rating)
+                        .font(AlbaFont.rounded(13, weight: .bold))
                         .foregroundColor(scoreColor(latest.overallScore))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.trailing)
 
                     Image(systemName: "chevron.right")
                         .font(.system(size: 12))
                         .foregroundColor(.gray.opacity(0.5))
                 }
+                .frame(maxWidth: 110)
             }
         }
         .padding(16)

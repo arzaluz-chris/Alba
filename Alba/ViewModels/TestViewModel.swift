@@ -22,6 +22,12 @@ final class TestViewModel: ObservableObject {
         self.questions = Self.buildQuestions()
     }
 
+    /// Set up for a new test with a pre-known friend name (from chat [EVALUATE: name])
+    func setupNewTestForFriend(name: String) {
+        friendNameInput = name
+        shouldSkipName = true
+    }
+
     /// Set up for re-evaluating an existing friend (skips gender + name questions)
     func setupReEvaluation(friendName: String, friendGender: Gender) {
         isReEvaluation = true
@@ -340,9 +346,9 @@ final class TestViewModel: ObservableObject {
 
     func generateDynamicSummary() -> TestResult {
         let (focusAreaKey, averageScore) = analyzeCategories()
-        let friendName = friendNameInput.isEmpty || shouldSkipName
+        let friendName = friendNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             ? (language == .es ? "Esta persona" : "This person")
-            : friendNameInput
+            : friendNameInput.trimmingCharacters(in: .whitespacesAndNewlines)
 
         var analysis = ""
         var recommendation = ""

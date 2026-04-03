@@ -69,9 +69,9 @@ struct AIPersonalizationView: View {
             }
             .padding(.horizontal, 24)
 
-            // Example preview
+            // Dynamic example reflecting style + length + emojis
             ExampleBubble(
-                text: personalization.style.exampleResponse(for: lang),
+                text: personalization.dynamicExample(for: lang),
                 title: L10n.t(.responseExample, lang)
             )
             .padding(.horizontal, 24)
