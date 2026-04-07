@@ -2,6 +2,7 @@ import SwiftUI
 
 struct JournalEntryComposeView: View {
     let friendName: String
+    var existingEntry: JournalEntry? = nil
     @EnvironmentObject var languageManager: LanguageManager
     @Environment(\.dismiss) private var dismiss
     @FocusState private var isTextEditorFocused: Bool
@@ -11,6 +12,7 @@ struct JournalEntryComposeView: View {
     @State private var entryDate: Date = Date()
     @State private var showDatePicker: Bool = false
 
+    private var isEditing: Bool { existingEntry != nil }
     private var lang: AppLanguage { languageManager.language }
 
     var body: some View {
@@ -134,7 +136,9 @@ struct JournalEntryComposeView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text(lang == .es ? "Nueva entrada" : "New entry")
+                Text(isEditing
+                     ? (lang == .es ? "Editar entrada" : "Edit entry")
+                     : (lang == .es ? "Nueva entrada" : "New entry"))
                     .font(AlbaFont.serif(20, weight: .bold))
                     .foregroundColor(.albaText)
             }
@@ -147,6 +151,7 @@ struct JournalEntryComposeView: View {
                 .foregroundColor(.albaAccent)
             }
         }
+        .onAppear { loadExistingEntry() }
         .sheet(isPresented: $showDatePicker) {
             VStack(spacing: 16) {
                 Text(lang == .es ? "Selecciona la fecha" : "Select date")
@@ -183,13 +188,31 @@ struct JournalEntryComposeView: View {
 
         HapticManager.shared.mediumImpact()
 
-        let entry = JournalEntry(
-            date: entryDate,
-            friendName: friendName,
-            text: trimmed,
-            mood: selectedMood
-        )
-        JournalEntryStore.shared.save(entry: entry)
+        if let existing = existingEntry {
+            let updated = JournalEntry(
+                id: existing.id,
+                date: entryDate,
+                friendName: friendName,
+                text: trimmed,
+                mood: selectedMood
+            )
+            JournalEntryStore.shared.update(entry: updated)
+        } else {
+            let entry = JournalEntry(
+                date: entryDate,
+                friendName: friendName,
+                text: trimmed,
+                mood: selectedMood
+            )
+            JournalEntryStore.shared.save(entry: entry)
+        }
         dismiss()
+    }
+
+    private func loadExistingEntry() {
+        guard let entry = existingEntry else { return }
+        text = entry.text
+        selectedMood = entry.mood
+        entryDate = entry.date
     }
 }

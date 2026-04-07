@@ -16,10 +16,18 @@ final class JournalSecurityManager: ObservableObject {
     private let pinKeychainKey = "alba_journal_pin_hash"
     private let pinEnabledKey = "alba_journal_pin_enabled"
     private let biometricEnabledKey = "alba_journal_biometric_enabled"
+    private let failedAttemptsKey = "alba_journal_failed_attempts"
+    private let firstFailedAtKey = "alba_journal_first_failed_at"
+
+    static let maxFailedAttempts = 5
+    private static let failedWindowSeconds: TimeInterval = 3600 // 1 hour
+
+    @Published var failedAttempts: Int = 0
 
     private init() {
         isPINEnabled = UserDefaults.standard.bool(forKey: pinEnabledKey)
         isBiometricEnabled = UserDefaults.standard.bool(forKey: biometricEnabledKey)
+        loadFailedAttempts()
     }
 
     var isBiometricAvailable: Bool {
@@ -42,7 +50,17 @@ final class JournalSecurityManager: ObservableObject {
 
     func verifyPIN(_ pin: String) -> Bool {
         guard let storedHash = KeychainHelper.load(key: pinKeychainKey) else { return false }
-        return hashPIN(pin) == storedHash
+        if hashPIN(pin) == storedHash {
+            resetFailedAttempts()
+            return true
+        } else {
+            registerFailedAttempt()
+            return false
+        }
+    }
+
+    var remainingAttempts: Int {
+        max(0, Self.maxFailedAttempts - failedAttempts)
     }
 
     func authenticateWithBiometrics(reason: String) async -> Bool {
@@ -86,6 +104,59 @@ final class JournalSecurityManager: ObservableObject {
     func unlock() {
         isUnlocked = true
     }
+
+    // MARK: - Failed Attempts
+
+    private func loadFailedAttempts() {
+        let count = UserDefaults.standard.integer(forKey: failedAttemptsKey)
+        let firstFailedAt = UserDefaults.standard.object(forKey: firstFailedAtKey) as? Date
+
+        // Reset if the window (1 hour) has expired since the first failed attempt
+        if let firstFailed = firstFailedAt,
+           Date().timeIntervalSince(firstFailed) > Self.failedWindowSeconds {
+            resetFailedAttempts()
+            return
+        }
+
+        failedAttempts = count
+    }
+
+    private func registerFailedAttempt() {
+        // Check window expiration before incrementing
+        if let firstFailed = UserDefaults.standard.object(forKey: firstFailedAtKey) as? Date,
+           Date().timeIntervalSince(firstFailed) > Self.failedWindowSeconds {
+            resetFailedAttempts()
+        }
+
+        // Set first-failure timestamp if this is the first attempt in a new window
+        if failedAttempts == 0 {
+            UserDefaults.standard.set(Date(), forKey: firstFailedAtKey)
+        }
+
+        failedAttempts += 1
+        UserDefaults.standard.set(failedAttempts, forKey: failedAttemptsKey)
+        logger.warning("⚠️ Failed PIN attempt \(self.failedAttempts)/\(Self.maxFailedAttempts)")
+
+        if failedAttempts >= Self.maxFailedAttempts {
+            wipeJournalData()
+        }
+    }
+
+    func resetFailedAttempts() {
+        failedAttempts = 0
+        UserDefaults.standard.set(0, forKey: failedAttemptsKey)
+        UserDefaults.standard.removeObject(forKey: firstFailedAtKey)
+    }
+
+    private func wipeJournalData() {
+        logger.error("🚨 Max PIN attempts reached — wiping journal data")
+        FriendshipStore.shared.deleteAll()
+        JournalEntryStore.shared.deleteAll()
+        removePIN()
+        resetFailedAttempts()
+    }
+
+    // MARK: - Helpers
 
     private func hashPIN(_ pin: String) -> String {
         let data = Data(pin.utf8)

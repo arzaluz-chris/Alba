@@ -6,6 +6,9 @@ struct DiarySection: View {
 
     @State private var entries: [JournalEntry] = []
     @State private var showCompose: Bool = false
+    @State private var entryToEdit: JournalEntry? = nil
+    @State private var entryToDelete: JournalEntry? = nil
+    @State private var showDeleteConfirm: Bool = false
 
     private var lang: AppLanguage { languageManager.language }
 
@@ -44,9 +47,24 @@ struct DiarySection: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 20)
             } else {
-                // Entry list (latest 5)
                 ForEach(entries.prefix(5)) { entry in
                     entryRow(entry)
+                        .onTapGesture {
+                            entryToEdit = entry
+                        }
+                        .contextMenu {
+                            Button {
+                                entryToEdit = entry
+                            } label: {
+                                Label(lang == .es ? "Editar" : "Edit", systemImage: "pencil")
+                            }
+                            Button(role: .destructive) {
+                                entryToDelete = entry
+                                showDeleteConfirm = true
+                            } label: {
+                                Label(lang == .es ? "Eliminar" : "Delete", systemImage: "trash")
+                            }
+                        }
                 }
 
                 if entries.count > 5 {
@@ -65,6 +83,41 @@ struct DiarySection: View {
         .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
         .onAppear { loadEntries() }
         .onChange(of: showCompose) { loadEntries() }
+        .sheet(item: $entryToEdit) { entry in
+            NavigationStack {
+                JournalEntryComposeView(friendName: friendName, existingEntry: entry)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button(lang == .es ? "Cancelar" : "Cancel") {
+                                entryToEdit = nil
+                            }
+                            .foregroundColor(.albaAccent)
+                        }
+                    }
+            }
+            .environmentObject(languageManager)
+            .onDisappear { loadEntries() }
+        }
+        .alert(
+            lang == .es ? "¿Eliminar entrada?" : "Delete entry?",
+            isPresented: $showDeleteConfirm
+        ) {
+            Button(lang == .es ? "Cancelar" : "Cancel", role: .cancel) {
+                entryToDelete = nil
+            }
+            Button(lang == .es ? "Eliminar" : "Delete", role: .destructive) {
+                if let entry = entryToDelete {
+                    JournalEntryStore.shared.delete(entryId: entry.id)
+                    HapticManager.shared.notification(.warning)
+                    loadEntries()
+                }
+                entryToDelete = nil
+            }
+        } message: {
+            Text(lang == .es
+                 ? "Esta acción no se puede deshacer."
+                 : "This action cannot be undone.")
+        }
     }
 
     private func entryRow(_ entry: JournalEntry) -> some View {

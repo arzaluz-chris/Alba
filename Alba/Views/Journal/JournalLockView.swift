@@ -7,6 +7,8 @@ struct JournalLockView: View {
     @State private var pinEntryId: UUID = UUID()
     @State private var showSecurityPrompt: Bool = false
     @State private var showPINSetup: Bool = false
+    @State private var showWipeAlert: Bool = false
+    @State private var errorMessage: String = ""
 
     private var lang: AppLanguage { languageManager.language }
 
@@ -29,7 +31,6 @@ struct JournalLockView: View {
         }
         .onAppear {
             if !securityManager.isPINEnabled {
-                // First time using journal? Ask about security
                 if !hasSeenPrompt {
                     showSecurityPrompt = true
                 }
@@ -54,6 +55,18 @@ struct JournalLockView: View {
             Text(lang == .es
                  ? "Tu journal contiene información personal. ¿Quieres protegerlo con un PIN o Face ID?"
                  : "Your journal contains personal information. Want to protect it with a PIN or Face ID?")
+        }
+        .alert(
+            lang == .es ? "Datos eliminados" : "Data Deleted",
+            isPresented: $showWipeAlert
+        ) {
+            Button("OK") {
+                currentView = .welcome
+            }
+        } message: {
+            Text(lang == .es
+                 ? "Se superó el límite de intentos. Todos los datos del journal han sido eliminados por seguridad."
+                 : "Maximum attempts exceeded. All journal data has been deleted for security.")
         }
         .sheet(isPresented: $showPINSetup) {
             PINSetupView {
@@ -93,14 +106,31 @@ struct JournalLockView: View {
                         if securityManager.verifyPIN(pin) {
                             securityManager.unlock()
                             HapticManager.shared.notification(.success)
+                            errorMessage = ""
                         } else {
                             HapticManager.shared.notification(.error)
+                            if securityManager.remainingAttempts <= 0 {
+                                showWipeAlert = true
+                            } else {
+                                errorMessage = lang == .es
+                                    ? "PIN incorrecto. \(securityManager.remainingAttempts) intento\(securityManager.remainingAttempts == 1 ? "" : "s") restante\(securityManager.remainingAttempts == 1 ? "" : "s")."
+                                    : "Incorrect PIN. \(securityManager.remainingAttempts) attempt\(securityManager.remainingAttempts == 1 ? "" : "s") remaining."
+                            }
                             pinEntryId = UUID()
                         }
                     },
                     onBiometric: securityManager.isBiometricEnabled ? { attemptBiometric() } : nil
                 )
                 .id(pinEntryId)
+
+                if !errorMessage.isEmpty {
+                    Text(errorMessage)
+                        .font(AlbaFont.rounded(14, weight: .medium))
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                        .transition(.opacity)
+                }
             }
         }
     }

@@ -42,6 +42,14 @@ final class JournalEntryStore {
         }
     }
 
+    func update(entry: JournalEntry) {
+        var all = loadAll()
+        guard let index = all.firstIndex(where: { $0.id == entry.id }) else { return }
+        all[index] = entry
+        persist(all)
+        logger.info("✏️ Updated entry \(entry.id)")
+    }
+
     func delete(entryId: UUID) {
         var all = loadAll()
         all.removeAll { $0.id == entryId }
