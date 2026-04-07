@@ -91,6 +91,7 @@
 			knownRegions = (
 				en,
 				Base,
+				es,
 			);
 			mainGroup = B92F4B892F737D5E0086DD61;
 			minimizedProjectReferenceProxies = 1;
@@ -160,7 +161,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = WQCQ3T6U7T;
+				DEVELOPMENT_TEAM = 3NH4T25N6U;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -224,7 +225,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = WQCQ3T6U7T;
+				DEVELOPMENT_TEAM = 3NH4T25N6U;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -254,14 +255,15 @@
 				CODE_SIGN_ENTITLEMENTS = Alba/Alba.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_TEAM = 3NH4T25N6U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Alba;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
-				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Alba necesita acceso a Apple Music para buscar y reproducir canciones.";
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Alba usa Face ID para proteger tu journal.";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Alba needs access to Apple Music to search and play songs.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Alba uses Face ID to protect your journal.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -297,14 +299,15 @@
 				CODE_SIGN_ENTITLEMENTS = Alba/Alba.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_TEAM = 3NH4T25N6U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Alba;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
-				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Alba necesita acceso a Apple Music para buscar y reproducir canciones.";
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Alba usa Face ID para proteger tu journal.";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Alba needs access to Apple Music to search and play songs.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Alba uses Face ID to protect your journal.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

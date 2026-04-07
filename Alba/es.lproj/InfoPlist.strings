@@ -1,0 +1,3 @@
+/* Spanish - Permission usage descriptions */
+"NSAppleMusicUsageDescription" = "Alba necesita acceso a Apple Music para buscar y reproducir canciones.";
+"NSFaceIDUsageDescription" = "Alba usa Face ID para proteger tu journal.";

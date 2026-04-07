@@ -1,0 +1,3 @@
+/* English - Permission usage descriptions */
+"NSAppleMusicUsageDescription" = "Alba needs access to Apple Music to search and play songs.";
+"NSFaceIDUsageDescription" = "Alba uses Face ID to protect your journal.";

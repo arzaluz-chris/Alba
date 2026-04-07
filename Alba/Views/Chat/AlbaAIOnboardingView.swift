@@ -198,7 +198,7 @@ struct AlbaAIOnboardingView: View {
                         : "I feel like my friend doesn't reach out like before...")
 
                     mockAlbaBubble(lang == .es
-                        ? "Entiendo como te sientes. Eso puede afectar la dimension de **Compromiso** en tu amistad. Te propongo algo: esta semana intenta iniciar una conversacion y expresar lo que sientes."
+                        ? "Entiendo cómo te sientes. Eso puede afectar la dimensión de **Compromiso** en tu amistad. Te propongo algo: esta semana intenta iniciar una conversación y expresar lo que sientes."
                         : "I understand how you feel. That can affect the **Engagement** dimension of your friendship. Here's an idea: this week, try starting a conversation and expressing how you feel.")
                 }
                 .padding(16)
@@ -237,7 +237,7 @@ struct AlbaAIOnboardingView: View {
                 // Mock conversation showing the test card
                 VStack(spacing: 12) {
                     mockAlbaBubble(lang == .es
-                        ? "Podria evaluar tu amistad con Laura. Parece que es alguien importante para ti."
+                        ? "Podría evaluar tu amistad con Laura. Parece que es alguien importante para ti."
                         : "I could evaluate your friendship with Laura. It seems like she's someone important to you.")
 
                     // Actual TakeTestCard component

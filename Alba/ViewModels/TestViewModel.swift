@@ -48,14 +48,14 @@ final class TestViewModel: ObservableObject {
     // MARK: - Question Bank
     static func buildQuestions() -> [Question] {
         [
-            Question(rawTextEs: "La persona de la que estas pensando es...",
+            Question(rawTextEs: "La persona de la que estás pensando es...",
                      rawTextEn: "The person you're thinking of is...",
                      type: .genderSelection, optionsEs: nil, optionsEn: nil, category: .friendGender),
 
-            Question(rawTextEs: "¿Te esfuerzas en hacer que tu amig(@) se sienta feliz y comod(@) contigo?",
+            Question(rawTextEs: "¿Te esfuerzas en hacer que tu amig(@) se sienta feliz y cómod(@) contigo?",
                      rawTextEn: "Do you try to make your friend feel happy and comfortable with you?",
                      type: .singleChoice,
-                     optionsEs: [Option(iconName: "circle", label: "Si", value: 3),
+                     optionsEs: [Option(iconName: "circle", label: "Sí", value: 3),
                                  Option(iconName: "circle", label: "A veces", value: 2),
                                  Option(iconName: "circle", label: "No", value: 1)],
                      optionsEn: [Option(iconName: "circle", label: "Yes", value: 3),
@@ -63,7 +63,7 @@ final class TestViewModel: ObservableObject {
                                  Option(iconName: "circle", label: "No", value: 1)],
                      category: .support),
 
-            Question(rawTextEs: "¿Cuando tienes un problema, puedes confiar en el(la)?",
+            Question(rawTextEs: "Cuando tienes un problema, ¿puedes confiar en él(la)?",
                      rawTextEn: "When you have a problem, can you trust them?",
                      type: .singleChoice,
                      optionsEs: [Option(iconName: "circle", label: "Siempre", value: 3),
@@ -77,15 +77,15 @@ final class TestViewModel: ObservableObject {
             Question(rawTextEs: "¿Crees que pueda confiar en ti?",
                      rawTextEn: "Do you think they can trust you?",
                      type: .singleChoice,
-                     optionsEs: [Option(iconName: "circle", label: "Si", value: 3),
-                                 Option(iconName: "circle", label: "No se", value: 2),
+                     optionsEs: [Option(iconName: "circle", label: "Sí", value: 3),
+                                 Option(iconName: "circle", label: "No lo sé", value: 2),
                                  Option(iconName: "circle", label: "No", value: 1)],
                      optionsEn: [Option(iconName: "circle", label: "Yes", value: 3),
                                  Option(iconName: "circle", label: "I'm not sure", value: 2),
                                  Option(iconName: "circle", label: "No", value: 1)],
                      category: .trust),
 
-            Question(rawTextEs: "¿Disfrutas pasar tiempo con el(la)?",
+            Question(rawTextEs: "¿Disfrutas pasar tiempo con él(la)?",
                      rawTextEn: "Do you enjoy spending time with them?",
                      type: .singleChoice,
                      optionsEs: [Option(iconName: "circle", label: "Obvio", value: 3),
@@ -100,7 +100,7 @@ final class TestViewModel: ObservableObject {
                      rawTextEn: "When one of you feels bad...",
                      type: .singleChoice,
                      optionsEs: [Option(iconName: "circle", label: "Siempre se apoyan en lo que sea necesario", value: 3),
-                                 Option(iconName: "circle", label: "Solo se preguntan \"¿estas bien?\"", value: 2),
+                                 Option(iconName: "circle", label: "Solo se preguntan \"¿estás bien?\"", value: 2),
                                  Option(iconName: "circle", label: "Fingen que no pasa nada", value: 1)],
                      optionsEn: [Option(iconName: "circle", label: "You always support each other", value: 3),
                                  Option(iconName: "circle", label: "You only ask \"Are you okay?\"", value: 2),
@@ -121,7 +121,7 @@ final class TestViewModel: ObservableObject {
             Question(rawTextEs: "¿Sientes que esta amistad te ha ayudado en tu crecimiento emocional?",
                      rawTextEn: "Do you feel this friendship has helped you grow emotionally?",
                      type: .singleChoice,
-                     optionsEs: [Option(iconName: "circle", label: "Si", value: 3),
+                     optionsEs: [Option(iconName: "circle", label: "Sí", value: 3),
                                  Option(iconName: "circle", label: "En algunas cosas", value: 2),
                                  Option(iconName: "circle", label: "No", value: 1)],
                      optionsEn: [Option(iconName: "circle", label: "Yes", value: 3),
@@ -129,10 +129,10 @@ final class TestViewModel: ObservableObject {
                                  Option(iconName: "circle", label: "No", value: 1)],
                      category: .support),
 
-            Question(rawTextEs: "¿Respetas los limites de tu amig(@)?",
+            Question(rawTextEs: "¿Respetas los límites de tu amig(@)?",
                      rawTextEn: "Do you respect your friend's boundaries?",
                      type: .singleChoice,
-                     optionsEs: [Option(iconName: "circle", label: "Si", value: 3),
+                     optionsEs: [Option(iconName: "circle", label: "Sí", value: 3),
                                  Option(iconName: "circle", label: "A veces", value: 2),
                                  Option(iconName: "circle", label: "No", value: 1)],
                      optionsEn: [Option(iconName: "circle", label: "Yes", value: 3),
@@ -140,10 +140,10 @@ final class TestViewModel: ObservableObject {
                                  Option(iconName: "circle", label: "No", value: 1)],
                      category: .limits),
 
-            Question(rawTextEs: "¿Crees que el(la) respeta los tuyos?",
+            Question(rawTextEs: "¿Crees que él(la) respeta los tuyos?",
                      rawTextEn: "Do you think they respect yours?",
                      type: .singleChoice,
-                     optionsEs: [Option(iconName: "circle", label: "Si", value: 3),
+                     optionsEs: [Option(iconName: "circle", label: "Sí", value: 3),
                                  Option(iconName: "circle", label: "A veces", value: 2),
                                  Option(iconName: "circle", label: "No", value: 1)],
                      optionsEn: [Option(iconName: "circle", label: "Yes", value: 3),
@@ -156,7 +156,7 @@ final class TestViewModel: ObservableObject {
                      type: .singleChoice,
                      optionsEs: [Option(iconName: "circle", label: "Se defienden", value: 3),
                                  Option(iconName: "circle", label: "Escuchan y no hacen nada", value: 2),
-                                 Option(iconName: "circle", label: "Tambien hablan mal", value: 1)],
+                                 Option(iconName: "circle", label: "También hablan mal", value: 1)],
                      optionsEn: [Option(iconName: "circle", label: "You defend each other", value: 3),
                                  Option(iconName: "circle", label: "You listen and do nothing", value: 2),
                                  Option(iconName: "circle", label: "You also talk badly", value: 1)],
@@ -167,13 +167,13 @@ final class TestViewModel: ObservableObject {
                      type: .singleChoice,
                      optionsEs: [Option(iconName: "circle", label: "Hacen todo lo posible para incluirse", value: 3),
                                  Option(iconName: "circle", label: "No hacen nada", value: 2),
-                                 Option(iconName: "circle", label: "Tambien se excluyen", value: 1)],
+                                 Option(iconName: "circle", label: "También se excluyen", value: 1)],
                      optionsEn: [Option(iconName: "circle", label: "You do everything you can to include them", value: 3),
                                  Option(iconName: "circle", label: "You do nothing", value: 2),
                                  Option(iconName: "circle", label: "You also exclude them", value: 1)],
                      category: .support),
 
-            Question(rawTextEs: "¿Eres honest(#) con el(la)?",
+            Question(rawTextEs: "¿Eres honest(#) con él(la)?",
                      rawTextEn: "Are you honest with them?",
                      type: .singleChoice,
                      optionsEs: [Option(iconName: "circle", label: "Siempre", value: 3),
@@ -195,7 +195,7 @@ final class TestViewModel: ObservableObject {
                                  Option(iconName: "circle", label: "Never", value: 1)],
                      category: .assertiveness),
 
-            Question(rawTextEs: "¿Cual es el nombre de tu amig(@)?",
+            Question(rawTextEs: "¿Cuál es el nombre de tu amig(@)?",
                      rawTextEn: "What's your friend's name?",
                      type: .textInput, optionsEs: nil, optionsEn: nil, category: .name)
         ]
@@ -284,7 +284,7 @@ final class TestViewModel: ObservableObject {
 
         var text = rawText
         text = text.replacingOccurrences(of: "(@)", with: base.at)
-        text = text.replacingOccurrences(of: "el(la)", with: base.ell)
+        text = text.replacingOccurrences(of: "él(la)", with: base.ell)
         text = text.replacingOccurrences(of: "a(la)", with: base.ala)
         text = text.replacingOccurrences(of: "un(@)", with: base.uno)
         text = text.replacingOccurrences(of: "otr(@)", with: base.otro)
@@ -327,9 +327,9 @@ final class TestViewModel: ObservableObject {
             switch key {
             case .support: return "Apoyo"
             case .trust: return "Confianza"
-            case .limits: return "Limites"
+            case .limits: return "Límites"
             case .assertiveness: return "Asertividad"
-            case .friendGender: return "Genero"
+            case .friendGender: return "Género"
             case .name: return "Nombre"
             }
         case .en:
@@ -356,54 +356,54 @@ final class TestViewModel: ObservableObject {
         var color = Color.resultNeutral
 
         if averageScore >= 2.8 {
-            rating = language == .es ? "Amistad Muy Solida" : "Very Strong Friendship"
+            rating = language == .es ? "Amistad Muy Sólida" : "Very Strong Friendship"
             color = .resultHigh
             analysis = language == .es
-                ? "Siento que tu amistad con \(friendName) es muy solida y estable. Las respuestas muestran que se tienen muchisima confianza, se apoyan en todo y hay mucho respeto."
+                ? "Siento que tu amistad con \(friendName) es muy sólida y estable. Las respuestas muestran que se tienen muchísima confianza, se apoyan en todo y hay mucho respeto."
                 : "It feels like your friendship with \(friendName) is very strong and stable. Your answers suggest there's a lot of trust, mutual support, and respect."
             recommendation = language == .es
-                ? "Sigue invirtiendo en esta amistad tan valiosa. Es clave que mantengan sus momentos especiales, celebren sus exitos de corazon y sigan comunicandose con mucha honestidad."
+                ? "Sigue invirtiendo en esta amistad tan valiosa. Es clave que mantengan sus momentos especiales, celebren sus éxitos de corazón y sigan comunicándose con mucha honestidad."
                 : "Keep investing in this valuable friendship. Protect your special moments, celebrate each other sincerely, and keep communicating with honesty."
         } else if averageScore <= 1.8 {
             rating = language == .es ? "Amistad Inestable" : "Unstable Friendship"
             color = .resultLow
             analysis = language == .es
-                ? "Tu amistad con \(friendName) parece ser agotadora para ambas partes, lo mejor es ver en que cosas no estan bien y mejorarlas o cortar la amistad."
+                ? "Tu amistad con \(friendName) parece ser agotadora para ambas partes, lo mejor es ver en qué cosas no están bien y mejorarlas o cortar la amistad."
                 : "Your friendship with \(friendName) seems exhausting for both of you. It may help to identify what isn't working and either improve it or consider stepping away."
             recommendation = language == .es
-                ? "Una amistad inestable es mala para ambas partes de la relacion, puede causar inseguridad e incluso, efectos negativos en la salud."
+                ? "Una amistad inestable es mala para ambas partes de la relación, puede causar inseguridad e incluso, efectos negativos en la salud."
                 : "An unstable friendship can hurt both people. It can create insecurity and even negative effects on your well-being."
         } else if focusAreaKey == .trust {
             rating = language == .es ? "Amistad en Progreso" : "Friendship in Progress"
             analysis = language == .es
-                ? "La relacion con \(friendName) va muy bien en muchas areas, pero podrian mejorar la confianza. Tus respuestas indican que todavia no se sienten libres de abrirse por completo."
+                ? "La relación con \(friendName) va muy bien en muchas áreas, pero podrían mejorar la confianza. Tus respuestas indican que todavía no se sienten libres de abrirse por completo."
                 : "Your relationship with \(friendName) is doing well in many areas, but trust could improve. Your answers suggest you may not feel fully free to open up."
             recommendation = language == .es
-                ? "Si quieres que esta amistad tenga mas Confianza, debe de haber compromiso en ambas partes y una buena comunicacion."
+                ? "Si quieres que esta amistad tenga más Confianza, debe de haber compromiso en ambas partes y una buena comunicación."
                 : "If you want more trust in this friendship, both of you need commitment and good communication."
         } else if focusAreaKey == .limits {
             rating = language == .es ? "Amistad en Progreso" : "Friendship in Progress"
             analysis = language == .es
-                ? "Tu amistad con \(friendName) es valiosa, pero deberian de mejorar en definir y respetar los Limites personales."
+                ? "Tu amistad con \(friendName) es valiosa, pero deberían de mejorar en definir y respetar los Límites personales."
                 : "Your friendship with \(friendName) is valuable, but defining and respecting personal boundaries could improve."
             recommendation = language == .es
-                ? "Si quieres que esta amistad tenga mejores Limites, debe de haber compromiso en ambas partes y una buena comunicacion."
+                ? "Si quieres que esta amistad tenga mejores Límites, debe de haber compromiso en ambas partes y una buena comunicación."
                 : "If you want healthier boundaries, both of you need commitment and good communication."
         } else if focusAreaKey == .assertiveness {
             rating = language == .es ? "Amistad en Progreso" : "Friendship in Progress"
             analysis = language == .es
-                ? "Tienes un gran cariño por \(friendName), pero tu punto de crecimiento es la Asertividad. Podrias estar guardandote lo que sientes por miedo al conflicto."
+                ? "Tienes un gran cariño por \(friendName), pero tu punto de crecimiento es la Asertividad. Podrías estar guardándote lo que sientes por miedo al conflicto."
                 : "You care a lot about \(friendName), but your growth area is assertiveness. You might be holding back what you feel out of fear of conflict."
             recommendation = language == .es
-                ? "Si quieres que esta amistad tenga mas Asertividad, debe de haber compromiso en ambas partes y una buena comunicacion."
+                ? "Si quieres que esta amistad tenga más Asertividad, debe de haber compromiso en ambas partes y una buena comunicación."
                 : "If you want more assertiveness, both of you need commitment and good communication."
         } else {
             rating = language == .es ? "Amistad en Progreso" : "Friendship in Progress"
             analysis = language == .es
-                ? "Te la pasas bien con \(friendName), pero los resultados indican que podrian mejorar en el Apoyo Mutuo y en invertir mas energia de calidad."
+                ? "Te la pasas bien con \(friendName), pero los resultados indican que podrían mejorar en el Apoyo Mutuo y en invertir más energía de calidad."
                 : "You have a good time with \(friendName), but the results suggest you could improve mutual support and invest more quality energy."
             recommendation = language == .es
-                ? "Si quieres que esta amistad tenga mas Apoyo Mutuo, debe de haber compromiso en ambas partes y una buena comunicacion."
+                ? "Si quieres que esta amistad tenga más Apoyo Mutuo, debe de haber compromiso en ambas partes y una buena comunicación."
                 : "If you want more mutual support, both of you need commitment and good communication."
         }
 

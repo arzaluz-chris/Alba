@@ -233,7 +233,7 @@ struct SettingsView: View {
                     }
                 } footer: {
                     Text(lang == .es
-                         ? "Esto eliminara todos tus datos de forma permanente."
+                         ? "Esto eliminará todos tus datos de forma permanente."
                          : "This will permanently delete all your data.")
                         .font(AlbaFont.rounded(12))
                 }
@@ -383,7 +383,7 @@ struct AboutView: View {
                             .multilineTextAlignment(.center)
 
                         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-                            Text(lang == .es ? "Version \(version)" : "Version \(version)")
+                            Text(lang == .es ? "Versión \(version)" : "Version \(version)")
                                 .font(AlbaFont.rounded(13))
                                 .foregroundColor(.gray)
                                 .padding(.top, 4)
@@ -398,12 +398,12 @@ struct AboutView: View {
 
                         creditRow(
                             role: lang == .es ? "Autora" : "Author",
-                            name: "Leslie Maldonado Hernandez"
+                            name: "Leslie Maldonado Hernández"
                         )
 
                         creditRow(
                             role: lang == .es ? "Autor" : "Author",
-                            name: "Jose Manuel Maldonado Roldan"
+                            name: "José Manuel Maldonado Roldán"
                         )
 
                         Divider()

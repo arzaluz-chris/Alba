@@ -16,9 +16,9 @@ struct Article: Identifiable, Equatable {
 struct AlbaBlocksData {
     static let articles: [Article] = [
         Article(
-            titleEs: "Limites: ¿Que son y que no son?",
+            titleEs: "Límites: ¿Qué son y qué no son?",
             titleEn: "Boundaries: What They Are (and Aren't)",
-            teaserEs: "Por que los limites sanos protegen vinculos y nos cuidan a todos.",
+            teaserEs: "Por qué los límites sanos protegen vínculos y nos cuidan a todos.",
             teaserEn: "Why healthy boundaries protect relationships and take care of us.",
             coverImageName: "limitsCover",
             resourceBaseName: "Articulo_Limites"
@@ -26,7 +26,7 @@ struct AlbaBlocksData {
         Article(
             titleEs: "Estudio revelador",
             titleEn: "Eye-opening Study",
-            teaserEs: "Un analisis profundo que revela datos que sorprenden.",
+            teaserEs: "Un análisis profundo que revela datos que sorprenden.",
             teaserEn: "A deep analysis that reveals surprising insights.",
             coverImageName: "estudioCover",
             resourceBaseName: "Articulo_EstudioRevelador"
@@ -52,7 +52,7 @@ struct AlbaBlocksData {
             return text
         }
         return lang == .es
-            ? "No se pudo cargar el articulo."
+            ? "No se pudo cargar el artículo."
             : "Couldn't load the article."
     }
 }

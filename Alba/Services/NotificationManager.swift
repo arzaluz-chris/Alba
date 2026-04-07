@@ -24,7 +24,7 @@ final class NotificationManager {
         content.title = "Alba"
         // Will be localized based on device language
         if Locale.current.language.languageCode?.identifier.hasPrefix("es") == true {
-            content.body = "¿Como van tus amistades esta semana? Estoy aqui si necesitas platicar."
+            content.body = "¿Cómo van tus amistades esta semana? Estoy aquí si necesitas platicar."
         } else {
             content.body = "How are your friendships this week? I'm here if you need to talk."
         }
@@ -51,7 +51,7 @@ final class NotificationManager {
         let content = UNMutableNotificationContent()
         content.title = "Alba"
         if Locale.current.language.languageCode?.identifier.hasPrefix("es") == true {
-            content.body = "Ha pasado un mes desde que evaluaste tu amistad con \(friendName). ¿Quieres ver como ha cambiado?"
+            content.body = "Ha pasado un mes desde que evaluaste tu amistad con \(friendName). ¿Quieres ver cómo ha cambiado?"
         } else {
             content.body = "It's been a month since you evaluated your friendship with \(friendName). Want to see how it's changed?"
         }
@@ -76,9 +76,9 @@ final class NotificationManager {
         let tips = [
             ("es", "Tip Alba: Las emociones positivas fortalecen los vinculos. Hoy, comparte algo que te hizo sonreir con un amigo."),
             ("en", "Alba Tip: Positive emotions strengthen bonds. Today, share something that made you smile with a friend."),
-            ("es", "Tip Alba: El compromiso mutuo es clave. ¿Cuando fue la ultima vez que hiciste algo especial por un amigo?"),
+            ("es", "Tip Alba: El compromiso mutuo es clave. ¿Cuándo fue la última vez que hiciste algo especial por un amigo?"),
             ("en", "Alba Tip: Mutual engagement is key. When was the last time you did something special for a friend?"),
-            ("es", "Tip Alba: Los limites sanos protegen las amistades. Recuerda: decir 'no' tambien es cuidar la relacion."),
+            ("es", "Tip Alba: Los límites sanos protegen las amistades. Recuerda: decir 'no' también es cuidar la relación."),
             ("en", "Alba Tip: Healthy boundaries protect friendships. Remember: saying 'no' is also caring for the relationship."),
         ]
 
