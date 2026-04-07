@@ -10,6 +10,7 @@ struct ContentView: View {
     @EnvironmentObject var languageManager: LanguageManager
     @EnvironmentObject var userViewModel: UserViewModel
     @EnvironmentObject var musicViewModel: MusicViewModel
+    @ObservedObject private var quickActionManager = QuickActionManager.shared
 
     @State private var currentView: AppState = .splash
 
@@ -39,6 +40,23 @@ struct ContentView: View {
                         currentView = .welcome
                     }
                 }
+            }
+        }
+        .onChange(of: quickActionManager.pendingAction) { action in
+            guard let action = action else { return }
+            if userViewModel.hasCompletedOnboarding && currentView == .welcome {
+                currentView = action
+                quickActionManager.pendingAction = nil
+            } else if userViewModel.hasCompletedOnboarding {
+                // App is still loading (splash), wait and navigate after landing on welcome
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+                    if quickActionManager.pendingAction != nil {
+                        currentView = action
+                        quickActionManager.pendingAction = nil
+                    }
+                }
+            } else {
+                quickActionManager.pendingAction = nil
             }
         }
     }

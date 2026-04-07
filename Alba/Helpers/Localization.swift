@@ -43,6 +43,10 @@ enum LKey: String {
     // Tutorial
     case tutSkip, tutNext, tutOpen, tutStart, tutDone
 
+    // Quick Actions
+    case quickActionTestSubtitle, quickActionChatSubtitle
+    case quickActionBlocksSubtitle, quickActionJournalSubtitle
+
     // AI Onboarding
     case aiOnboardingPrivacyTitle, aiOnboardingPrivacyBody, aiOnboardingDisclaimerBody
     case aiOnboardingAccept
@@ -135,6 +139,11 @@ struct L10n {
         .responseLength: "Extensión de respuesta",
         .useEmojis: "Usar emojis",
         .responseExample: "Ejemplo de respuesta",
+
+        .quickActionTestSubtitle: "Evalúa una amistad",
+        .quickActionChatSubtitle: "Habla con Alba",
+        .quickActionBlocksSubtitle: "Lee artículos",
+        .quickActionJournalSubtitle: "Ve tu diario",
 
         .articleLoadError: "No se pudo cargar el artículo.",
 
@@ -230,6 +239,11 @@ struct L10n {
         .responseLength: "Response length",
         .useEmojis: "Use emojis",
         .responseExample: "Response example",
+
+        .quickActionTestSubtitle: "Evaluate a friendship",
+        .quickActionChatSubtitle: "Chat with Alba",
+        .quickActionBlocksSubtitle: "Read articles",
+        .quickActionJournalSubtitle: "View your journal",
 
         .articleLoadError: "Couldn't load the article.",
 

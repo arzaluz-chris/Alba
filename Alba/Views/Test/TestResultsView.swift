@@ -1,9 +1,11 @@
 import SwiftUI
+import StoreKit
 
 struct TestResultsView: View {
     let result: TestResult
     @Binding var currentView: AppState
     @EnvironmentObject var languageManager: LanguageManager
+    @Environment(\.requestReview) private var requestReview
 
     let onExploreWithAlba: (String) -> Void
     let onBack: () -> Void
@@ -104,6 +106,32 @@ struct TestResultsView: View {
             withAnimation {
                 appeared = true
             }
+            requestAppReviewIfNeeded()
+        }
+    }
+
+    // MARK: - App Review Request
+
+    private func requestAppReviewIfNeeded() {
+        let defaults = UserDefaults.standard
+        let countKey = "alba_completed_tests_count"
+        let versionKey = "alba_last_review_request_version"
+
+        // Increment completed tests count
+        let count = defaults.integer(forKey: countKey) + 1
+        defaults.set(count, forKey: countKey)
+
+        // Only prompt after the 2nd completed test
+        guard count >= 2 else { return }
+
+        // Don't re-prompt on the same app version
+        let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+        if defaults.string(forKey: versionKey) == currentVersion { return }
+
+        // Request review after a short delay so the results view is visible
+        defaults.set(currentVersion, forKey: versionKey)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            requestReview()
         }
     }
 }

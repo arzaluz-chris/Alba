@@ -276,7 +276,8 @@ struct SettingsView: View {
             "has_completed_onboarding", "has_completed_ai_onboarding",
             "ai_personalization", "hasSeenJournalSecurityPrompt",
             "alba_current_conversation_id", "alba_current_conversation_timestamp",
-            "alba_daily_message_count", "alba_daily_message_date"
+            "alba_daily_message_count", "alba_daily_message_date",
+            "alba_completed_tests_count", "alba_last_review_request_version"
         ]
         for key in keysToRemove {
             UserDefaults.standard.removeObject(forKey: key)
