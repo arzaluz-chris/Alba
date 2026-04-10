@@ -20,29 +20,23 @@ struct AlbaTestView: View {
 
             VStack(spacing: 0) {
                 // MARK: - Top Bar
-                HStack {
-                    Button {
-                        HapticManager.shared.lightImpact()
-                        viewModel.resetTest()
-                        currentView = .welcome
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.albaText)
+                ZStack {
+                    HStack {
+                        Button {
+                            HapticManager.shared.lightImpact()
+                            viewModel.resetTest()
+                            currentView = .welcome
+                        } label: {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.albaText)
+                        }
+                        Spacer()
                     }
-
-                    Spacer()
 
                     Text(L10n.t(.albaTestTitle, lang))
                         .font(AlbaFont.serif(20, weight: .bold))
                         .foregroundColor(.albaText)
-
-                    Spacer()
-
-                    // Invisible spacer for centering
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 16, weight: .semibold))
-                        .opacity(0)
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 14)

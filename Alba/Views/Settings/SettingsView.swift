@@ -39,24 +39,6 @@ struct SettingsView: View {
                     }
                     .listRowBackground(Color.white.opacity(0.5))
 
-                    // MARK: - AI Personalization
-                    NavigationLink {
-                        AIPersonalizationView()
-                    } label: {
-                        HStack(spacing: 14) {
-                            Image(systemName: "sparkles")
-                                .font(.system(size: 18, weight: .medium))
-                                .foregroundColor(.albaAccent)
-                                .frame(width: 32)
-
-                            Text(L10n.t(.aiPersonalization, lang))
-                                .font(AlbaFont.rounded(16, weight: .medium))
-                                .foregroundColor(.albaText)
-                        }
-                        .padding(.vertical, 6)
-                    }
-                    .listRowBackground(Color.white.opacity(0.5))
-
                     // MARK: - Language
                     NavigationLink {
                         LanguageSelectionView()
@@ -274,7 +256,7 @@ struct SettingsView: View {
         let keysToRemove = [
             "user_name", "user_gender",
             "has_completed_onboarding", "has_completed_ai_onboarding",
-            "ai_personalization", "hasSeenJournalSecurityPrompt",
+            "hasSeenJournalSecurityPrompt",
             "alba_current_conversation_id", "alba_current_conversation_timestamp",
             "alba_daily_message_count", "alba_daily_message_date",
             "alba_completed_tests_count", "alba_last_review_request_version"
@@ -288,7 +270,6 @@ struct SettingsView: View {
         userViewModel.selectedGender = nil
         userViewModel.hasCompletedOnboarding = false
         userViewModel.hasCompletedAIOnboarding = false
-        userViewModel.aiPersonalization = AIPersonalization()
 
         HapticManager.shared.notification(.warning)
         dismiss()

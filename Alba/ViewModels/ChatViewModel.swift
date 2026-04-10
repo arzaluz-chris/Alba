@@ -139,7 +139,6 @@ final class ChatViewModel: ObservableObject {
             do {
                 let rawResponse = try await geminiService.sendMessage(
                     prompt, history: history, language: language,
-                    personalization: userViewModel.aiPersonalization,
                     hiddenContext: hiddenContext,
                     userName: userViewModel.userName
                 )

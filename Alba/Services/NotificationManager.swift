@@ -12,7 +12,6 @@ final class NotificationManager {
             if granted {
                 logger.info("✅ Notification permission granted")
                 self.scheduleWeeklyReminder()
-                self.scheduleFriendshipTip()
             } else {
                 logger.info("❌ Notification permission denied: \(error?.localizedDescription ?? "none")")
             }
@@ -70,37 +69,6 @@ final class NotificationManager {
                 logger.info("📅 Re-eval reminder scheduled for \(friendName) in \(afterDays) days")
             }
         }
-    }
-
-    func scheduleFriendshipTip() {
-        let tips = [
-            ("es", "Tip Alba: Las emociones positivas fortalecen los vinculos. Hoy, comparte algo que te hizo sonreir con un amigo."),
-            ("en", "Alba Tip: Positive emotions strengthen bonds. Today, share something that made you smile with a friend."),
-            ("es", "Tip Alba: El compromiso mutuo es clave. ¿Cuándo fue la última vez que hiciste algo especial por un amigo?"),
-            ("en", "Alba Tip: Mutual engagement is key. When was the last time you did something special for a friend?"),
-            ("es", "Tip Alba: Los límites sanos protegen las amistades. Recuerda: decir 'no' también es cuidar la relación."),
-            ("en", "Alba Tip: Healthy boundaries protect friendships. Remember: saying 'no' is also caring for the relationship."),
-        ]
-
-        let isSpanish = Locale.current.language.languageCode?.identifier.hasPrefix("es") == true
-        let filtered = tips.filter { $0.0 == (isSpanish ? "es" : "en") }
-
-        for (index, tip) in filtered.enumerated() {
-            let content = UNMutableNotificationContent()
-            content.title = "Alba"
-            content.body = tip.1
-            content.sound = .default
-
-            // Schedule one tip per week, on different days
-            var dateComponents = DateComponents()
-            dateComponents.weekday = 4 + index // Wed, Thu, Fri
-            dateComponents.hour = 18 // 6 PM
-            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-
-            let request = UNNotificationRequest(identifier: "alba_tip_\(index)", content: content, trigger: trigger)
-            UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
-        }
-        logger.info("📅 Friendship tips scheduled")
     }
 
     func cancelAll() {

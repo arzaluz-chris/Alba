@@ -11,14 +11,12 @@ struct AlbaAIOnboardingView: View {
         case agreement = 0
         case tourChat = 1
         case tourTest = 2
-        case tourPersonalization = 3
-        case done = 4
+        case done = 3
     }
 
     @State private var currentStep: OnboardingStep = .agreement
 
     private var lang: AppLanguage { languageManager.language }
-    private var personalization: AIPersonalization { userViewModel.aiPersonalization }
     private var totalSteps: Int { OnboardingStep.allCases.count }
 
     var body: some View {
@@ -50,12 +48,6 @@ struct AlbaAIOnboardingView: View {
                             ))
                     case .tourTest:
                         tourTestStep
-                            .transition(.asymmetric(
-                                insertion: .opacity.combined(with: .move(edge: .trailing)),
-                                removal: .opacity.combined(with: .move(edge: .leading))
-                            ))
-                    case .tourPersonalization:
-                        tourPersonalizationStep
                             .transition(.asymmetric(
                                 insertion: .opacity.combined(with: .move(edge: .trailing)),
                                 removal: .opacity.combined(with: .move(edge: .leading))
@@ -273,140 +265,7 @@ struct AlbaAIOnboardingView: View {
         }
     }
 
-    // MARK: - Step 4: Tour Personalization (Functional)
-
-    private var tourPersonalizationStep: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                Spacer().frame(height: 12)
-
-                Text(L10n.t(.aiOnboardingTourPersonalizationTitle, lang))
-                    .font(AlbaFont.serif(22, weight: .bold))
-                    .foregroundColor(.albaText)
-                    .padding(.horizontal, 24)
-
-                Text(L10n.t(.aiOnboardingTourPersonalizationBody, lang))
-                    .font(AlbaFont.rounded(14, weight: .medium))
-                    .foregroundColor(.albaText.opacity(0.7))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-
-                // Communication Style grid
-                VStack(alignment: .leading, spacing: 16) {
-                    Text(L10n.t(.communicationStyle, lang))
-                        .font(AlbaFont.serif(18, weight: .bold))
-                        .foregroundColor(.albaText)
-
-                    let columns = [
-                        GridItem(.flexible(), spacing: 12),
-                        GridItem(.flexible(), spacing: 12)
-                    ]
-                    LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach(CommunicationStyle.allCases) { style in
-                            StyleCard(
-                                style: style,
-                                isSelected: personalization.style == style,
-                                lang: lang
-                            ) {
-                                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
-                                    userViewModel.aiPersonalization.style = style
-                                }
-                                HapticManager.shared.selection()
-                            }
-                        }
-                    }
-
-                    ExampleBubble(
-                        text: personalization.style.exampleResponse(for: lang),
-                        title: L10n.t(.responseExample, lang)
-                    )
-                }
-                .padding(.horizontal, 24)
-
-                // Response Length picker
-                VStack(alignment: .leading, spacing: 16) {
-                    Text(L10n.t(.responseLength, lang))
-                        .font(AlbaFont.serif(18, weight: .bold))
-                        .foregroundColor(.albaText)
-
-                    HStack(spacing: 0) {
-                        ForEach(ResponseLength.allCases) { length in
-                            Button {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                    userViewModel.aiPersonalization.length = length
-                                }
-                                HapticManager.shared.selection()
-                            } label: {
-                                Text(length.displayName(for: lang))
-                                    .font(AlbaFont.rounded(14, weight: personalization.length == length ? .bold : .medium))
-                                    .foregroundColor(personalization.length == length ? .white : .albaText)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .background(
-                                        personalization.length == length
-                                            ? AnyShapeStyle(LinearGradient.albaAccentGradient)
-                                            : AnyShapeStyle(Color.clear)
-                                    )
-                                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                            }
-                        }
-                    }
-                    .padding(4)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
-                    )
-                }
-                .padding(.horizontal, 24)
-
-                // Emoji toggle
-                HStack {
-                    HStack(spacing: 12) {
-                        Image(systemName: "face.smiling")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(.albaAccent)
-                            .frame(width: 32)
-
-                        Text(L10n.t(.useEmojis, lang))
-                            .font(AlbaFont.rounded(16, weight: .medium))
-                            .foregroundColor(.albaText)
-                    }
-
-                    Spacer()
-
-                    Toggle("", isOn: Binding(
-                        get: { personalization.useEmojis },
-                        set: { newValue in
-                            userViewModel.aiPersonalization.useEmojis = newValue
-                            HapticManager.shared.selection()
-                        }
-                    ))
-                    .tint(.albaAccent)
-                    .labelsHidden()
-                }
-                .padding(18)
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
-                )
-                .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
-                .padding(.horizontal, 24)
-
-                GlassActionButton(L10n.t(.aiOnboardingContinue, lang), icon: "arrow.right") {
-                    advanceStep()
-                }
-                .padding(.horizontal, 24)
-
-                Spacer().frame(height: 32)
-            }
-        }
-    }
-
-    // MARK: - Step 5: Done
+    // MARK: - Step 4: Done
 
     @State private var doneAvatarScale: CGFloat = 0.5
     @State private var doneAvatarOpacity: Double = 0
