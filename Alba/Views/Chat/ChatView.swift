@@ -90,10 +90,16 @@ struct ChatView: View {
                             }
 
                             ForEach(viewModel.messages) { message in
-                                ChatBubble(message: message) { friendName in
-                                    viewModel.saveCurrentConversation()
-                                    currentView = .newTestForFriend(friendName: friendName)
-                                }
+                                ChatBubble(
+                                    message: message,
+                                    onTakeTest: { friendName in
+                                        viewModel.saveCurrentConversation()
+                                        currentView = .newTestForFriend(friendName: friendName)
+                                    },
+                                    onDeclineTest: { friendName in
+                                        viewModel.declineTest(messageId: message.id, friendName: friendName)
+                                    }
+                                )
                                 .id(message.id)
                             }
 

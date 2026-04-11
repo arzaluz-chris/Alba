@@ -124,6 +124,25 @@ final class ChatViewModel: ObservableObject {
         hiddenContext = nil
     }
 
+    /// Called when the user taps "Ahora no" / "Not now" on a Take Test card.
+    /// Persists the decline so AlbaAI never offers the test for this friend again,
+    /// and replaces the in-chat card with a soft acknowledgment.
+    func declineTest(messageId: UUID, friendName: String) {
+        DeclinedFriendsStore.shared.decline(friendName)
+
+        guard let index = messages.firstIndex(where: { $0.id == messageId }) else { return }
+        var updated = messages[index]
+        updated.action = .testDeclined(friendName: friendName)
+        updated.text = language == .es
+            ? "Está bien, no te volveré a preguntar por **\(friendName)**."
+            : "No problem, I won't ask again about **\(friendName)**."
+        withAnimation(.easeInOut(duration: 0.25)) {
+            messages[index] = updated
+        }
+        HapticManager.shared.lightImpact()
+        saveCurrentConversation()
+    }
+
     // MARK: - Core Gemini Call
 
     private func callGemini(prompt: String, history: [Message], hiddenContext: String?) {
@@ -151,14 +170,16 @@ final class ChatViewModel: ObservableObject {
 
                 withAnimation(.spring(response: 0.4)) {
                     if let friendName = evaluateFriend {
-                        // Only show test card if friend is NOT already evaluated
+                        // Only show test card if friend is NOT already evaluated AND
+                        // hasn't been previously declined by the user.
                         let alreadyEvaluated = FriendshipStore.shared.uniqueFriends().contains(where: {
                             $0.lowercased() == friendName.lowercased()
                         })
+                        let alreadyDeclined = DeclinedFriendsStore.shared.isDeclined(friendName)
 
                         messages.append(Message(text: cleanText, isUser: false))
 
-                        if !alreadyEvaluated {
+                        if !alreadyEvaluated && !alreadyDeclined {
                             var testMsg = Message(
                                 text: language == .es
                                     ? "¿Quieres evaluar tu amistad con \(friendName)? Haz el Alba Test para obtener un análisis completo."

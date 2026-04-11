@@ -211,6 +211,7 @@ struct OptionButton: View {
 struct ChatBubble: View {
     let message: Message
     var onTakeTest: ((String) -> Void)?
+    var onDeclineTest: ((String) -> Void)?
 
     var body: some View {
         VStack(alignment: message.isUser ? .trailing : .leading, spacing: 6) {
@@ -250,9 +251,11 @@ struct ChatBubble: View {
 
             // Embedded "Take Test" card if action is present
             if case .takeTest(let friendName) = message.action {
-                TakeTestCard(friendName: friendName) {
-                    onTakeTest?(friendName)
-                }
+                TakeTestCard(
+                    friendName: friendName,
+                    onAccept: { onTakeTest?(friendName) },
+                    onDecline: { onDeclineTest?(friendName) }
+                )
                 .padding(.leading, 40) // Align with bubble (after avatar)
             }
         }
@@ -273,51 +276,74 @@ struct ChatBubble: View {
 // MARK: - Embedded "Take Test" Card
 struct TakeTestCard: View {
     let friendName: String
-    let onTap: () -> Void
+    let onAccept: () -> Void
+    let onDecline: () -> Void
 
+    @EnvironmentObject var languageManager: LanguageManager
     @State private var appeared = false
 
-    var body: some View {
-        Button(action: {
-            HapticManager.shared.mediumImpact()
-            onTap()
-        }) {
-            HStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(LinearGradient.albaAccentGradient)
-                        .frame(width: 42, height: 42)
-                    Image(systemName: "checklist")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.white)
-                }
+    private var lang: AppLanguage { languageManager.language }
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Alba Test")
-                        .font(AlbaFont.rounded(15, weight: .bold))
-                        .foregroundColor(.albaText)
-                    Text(friendName)
-                        .font(AlbaFont.rounded(13))
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Button(action: {
+                HapticManager.shared.mediumImpact()
+                onAccept()
+            }) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(LinearGradient.albaAccentGradient)
+                            .frame(width: 42, height: 42)
+                        Image(systemName: "checklist")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Alba Test")
+                            .font(AlbaFont.rounded(15, weight: .bold))
+                            .foregroundColor(.albaText)
+                        Text(friendName)
+                            .font(AlbaFont.rounded(13))
+                            .foregroundColor(.albaAccent)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "arrow.right.circle.fill")
+                        .font(.system(size: 24))
                         .foregroundColor(.albaAccent)
                 }
-
-                Spacer()
-
-                Image(systemName: "arrow.right.circle.fill")
-                    .font(.system(size: 24))
-                    .foregroundColor(.albaAccent)
+                .padding(14)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.albaAccent.opacity(0.3), lineWidth: 1.2)
+                )
+                .shadow(color: Color.albaAccent.opacity(0.15), radius: 8, x: 0, y: 4)
             }
-            .padding(14)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(Color.albaAccent.opacity(0.3), lineWidth: 1.2)
-            )
-            .shadow(color: Color.albaAccent.opacity(0.15), radius: 8, x: 0, y: 4)
+            .buttonStyle(.plain)
+
+            Button(action: {
+                HapticManager.shared.lightImpact()
+                onDecline()
+            }) {
+                Text(lang == .es ? "Ahora no" : "Not now")
+                    .font(AlbaFont.rounded(13, weight: .semibold))
+                    .foregroundColor(.gray)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 14)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule().stroke(Color.gray.opacity(0.25), lineWidth: 0.8)
+                    )
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
-        .frame(maxWidth: 280)
+        .frame(maxWidth: 280, alignment: .leading)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .onAppear {

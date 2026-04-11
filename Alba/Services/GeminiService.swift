@@ -300,7 +300,11 @@ final class GeminiService {
     /// Builds a summary of all evaluated friendships so Gemini can reference them
     private func buildJournalContext(language: AppLanguage) -> String {
         let friends = FriendshipStore.shared.uniqueFriends()
-        guard !friends.isEmpty else { return "" }
+        let declined = DeclinedFriendsStore.shared.declinedNames()
+
+        // If there's nothing to say (no friends evaluated AND none declined), still emit
+        // a minimal header with the declined-list rules so Gemini doesn't re-offer the test.
+        if friends.isEmpty && declined.isEmpty { return "" }
 
         var lines: [String] = []
         let header = language == .es
@@ -334,9 +338,21 @@ final class GeminiService {
             }
         }
 
+        // List of friends the user has explicitly declined to evaluate via chat.
+        // Gemini must NOT re-offer the test for these names.
+        if !declined.isEmpty {
+            let declinedHeader = language == .es
+                ? "AMIGOS QUE EL USUARIO RECHAZÓ EVALUAR (NO ofrezcas el test ni añadas [EVALUAR:] para estos nombres):"
+                : "FRIENDS THE USER DECLINED TO EVALUATE (DO NOT offer the test nor add [EVALUATE:] for these names):"
+            lines.append(declinedHeader)
+            for name in declined {
+                lines.append("- \(name)")
+            }
+        }
+
         let footer = language == .es
-            ? "IMPORTANTE: Si el usuario menciona a CUALQUIER persona por nombre que NO aparece en esta lista, SIEMPRE agrega [EVALUAR: nombre] al final de tu respuesta. No esperes a que el usuario pida una evaluación."
-            : "IMPORTANT: If the user mentions ANY person by name who is NOT in this list, ALWAYS add [EVALUATE: name] at the end of your response. Don't wait for the user to ask for an evaluation."
+            ? "IMPORTANTE: Si el usuario menciona a CUALQUIER persona por nombre que NO aparece en NINGUNA de las listas anteriores (ni evaluados ni rechazados), SIEMPRE agrega [EVALUAR: nombre] al final de tu respuesta. Si el nombre aparece en la lista de rechazados, NUNCA agregues [EVALUAR:] para esa persona."
+            : "IMPORTANT: If the user mentions ANY person by name who is NOT in EITHER of the lists above (neither evaluated nor declined), ALWAYS add [EVALUATE: name] at the end of your response. If the name appears in the declined list, NEVER add [EVALUATE:] for that person."
         lines.append(footer)
 
         return lines.joined(separator: "\n")

@@ -3,11 +3,12 @@ import Foundation
 enum MessageAction: Equatable {
     case none
     case takeTest(friendName: String) // Embed "Take Test" card for this friend
+    case testDeclined(friendName: String) // User dismissed the offer for this friend
 }
 
 struct Message: Identifiable, Equatable {
     let id = UUID()
-    let text: String
+    var text: String
     let isUser: Bool
     let date = Date()
     var action: MessageAction = .none

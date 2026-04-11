@@ -233,9 +233,11 @@ struct AlbaAIOnboardingView: View {
                         : "I could evaluate your friendship with Laura. It seems like she's someone important to you.")
 
                     // Actual TakeTestCard component
-                    TakeTestCard(friendName: "Laura") {
-                        HapticManager.shared.lightImpact()
-                    }
+                    TakeTestCard(
+                        friendName: "Laura",
+                        onAccept: { HapticManager.shared.lightImpact() },
+                        onDecline: { HapticManager.shared.lightImpact() }
+                    )
                     .padding(.leading, 40)
                     .allowsHitTesting(false)
                 }
