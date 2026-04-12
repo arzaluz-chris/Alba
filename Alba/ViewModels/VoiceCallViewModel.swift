@@ -201,14 +201,19 @@ final class VoiceCallViewModel: ObservableObject {
     private func appendSummaryToChat(durationSeconds: Int, reason: EndReason) {
         guard let chat = chatViewModel else { return }
 
+        // Embed the duration into the text itself so it still renders correctly
+        // after a conversation is re-loaded from history (SavedMessage only
+        // persists text + isUser, not the .voiceCallSummary action).
+        let durationString = Self.formatDuration(seconds: durationSeconds)
+        let label = L10n.t(.voiceCallDurationLabel, language)
         let summaryText: String
         switch reason {
         case .user:
-            summaryText = L10n.t(.voiceCallDurationLabel, language)
+            summaryText = "\(label) · \(durationString)"
         case .maxDuration:
-            summaryText = L10n.t(.voiceCallMaxDurationReached, language)
+            summaryText = "\(label) · \(durationString) — " + L10n.t(.voiceCallMaxDurationReached, language)
         case .error:
-            summaryText = L10n.t(.voiceCallErrorGeneric, language)
+            summaryText = "\(label) · \(durationString) — " + L10n.t(.voiceCallErrorGeneric, language)
         }
 
         var msg = Message(text: summaryText, isUser: false)
@@ -217,6 +222,15 @@ final class VoiceCallViewModel: ObservableObject {
             chat.messages.append(msg)
         }
         chat.saveCurrentConversation()
+    }
+
+    private static func formatDuration(seconds: Int) -> String {
+        let m = seconds / 60
+        let s = seconds % 60
+        if m > 0 {
+            return "\(m)m \(s)s"
+        }
+        return "\(s)s"
     }
 
     // MARK: - System instruction

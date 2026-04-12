@@ -119,13 +119,15 @@ struct VoiceCallView: View {
         case .permissionDenied:
             return L10n.t(.voiceCallMicPermissionDenied, lang)
         case .active:
+            // Only flip between 2 states: Alba speaking, or Alba listening.
+            // We intentionally do NOT react to `isUserSpeaking` here because it
+            // toggles every time the user pauses between words, producing
+            // rapid flicker. "Alba is listening" is the honest default
+            // whenever the model isn't talking.
             if viewModel.liveService.isModelSpeaking {
                 return L10n.t(.voiceCallAlbaSpeaking, lang)
             }
-            if viewModel.liveService.isUserSpeaking {
-                return L10n.t(.voiceCallAlbaListening, lang)
-            }
-            return L10n.t(.voiceCallStartSpeaking, lang)
+            return L10n.t(.voiceCallAlbaListening, lang)
         case .paused:
             return L10n.t(.voiceCallPaused, lang)
         case .ending:
