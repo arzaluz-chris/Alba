@@ -56,6 +56,9 @@ final class GeminiLiveService: ObservableObject {
     init() {
         audioEngine.attach(audioPlayerNode)
         audioEngine.connect(audioPlayerNode, to: audioEngine.mainMixerNode, format: playbackFormat)
+        // Enable hardware-level echo cancellation / noise suppression so Alba's
+        // voice doesn't feed back into the mic while she's speaking.
+        try? audioEngine.inputNode.setVoiceProcessingEnabled(true)
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleInterruption(_:)),
@@ -104,8 +107,18 @@ final class GeminiLiveService: ObservableObject {
 
     func connect(systemInstruction: String, voiceName: String) async throws {
         liveLogger.info("🔌 Connecting Gemini Live. model=\(RemoteConfigService.shared.geminiLiveModel) voice=\(voiceName)")
+
+        // 1. Audio session FIRST — must be active before the engine queries formats.
         try configureAudioSession()
 
+        // 2. Prepare & start the engine BEFORE the network call. This gives
+        //    AVAudioEngine time to negotiate formats with the active session.
+        audioEngine.prepare()
+        if !audioEngine.isRunning {
+            try audioEngine.start()
+        }
+
+        // 3. Now make the network handshake to Gemini.
         let ai = FirebaseAI.firebaseAI(backend: .googleAI())
         let speechConfig = SpeechConfig(voiceName: voiceName)
 
@@ -121,10 +134,6 @@ final class GeminiLiveService: ObservableObject {
         )
 
         session = try await liveModel.connect()
-
-        if !audioEngine.isRunning {
-            try audioEngine.start()
-        }
 
         isConnected = true
         isPaused = false
@@ -180,6 +189,16 @@ final class GeminiLiveService: ObservableObject {
     func resume() {
         guard isPaused else { return }
         isPaused = false
+        // If the engine was stopped by the system while paused, bring it back.
+        if !audioEngine.isRunning {
+            do {
+                audioEngine.prepare()
+                try audioEngine.start()
+            } catch {
+                liveLogger.error("❌ Failed to restart engine on resume: \(error.localizedDescription)")
+                return
+            }
+        }
         audioPlayerNode.play()
         startMicCapture()
         liveLogger.info("▶️ Voice session resumed")
@@ -198,13 +217,43 @@ final class GeminiLiveService: ObservableObject {
 
     private func startMicCapture() {
         guard !isMicTapInstalled else { return }
+
+        // If the engine stopped during a pause/resume dance, bring it back up.
+        if !audioEngine.isRunning {
+            do {
+                audioEngine.prepare()
+                try audioEngine.start()
+            } catch {
+                liveLogger.error("❌ Failed to restart audio engine: \(error.localizedDescription)")
+                return
+            }
+        }
+
         let inputNode = audioEngine.inputNode
-        let inputFormat = inputNode.outputFormat(forBus: 0)
+
+        // iOS 26 + .voiceChat: outputFormat(forBus:) sometimes returns a zero
+        // sample rate until the first buffer is pulled. Query the hardware
+        // format directly (which the audio session dictates) as the primary
+        // source of truth, falling back through a chain.
+        var inputFormat = inputNode.inputFormat(forBus: 0)
+        if inputFormat.sampleRate == 0 {
+            inputFormat = inputNode.outputFormat(forBus: 0)
+        }
+        if inputFormat.sampleRate == 0 {
+            // Last-ditch fallback — modern iPhones run at 48 kHz mono float after .voiceChat.
+            inputFormat = AVAudioFormat(
+                standardFormatWithSampleRate: 48000,
+                channels: 1
+            ) ?? inputFormat
+            liveLogger.warning("⚠️ Falling back to hardcoded 48kHz mono input format")
+        }
 
         guard inputFormat.sampleRate > 0 else {
-            liveLogger.warning("⚠️ Input node has invalid format, skipping mic capture")
+            liveLogger.error("❌ Cannot obtain any valid mic format; aborting capture. inputFormat=\(inputFormat)")
             return
         }
+
+        liveLogger.info("🎤 Mic format ready: \(inputFormat.sampleRate)Hz \(inputFormat.channelCount)ch commonFormat=\(inputFormat.commonFormat.rawValue)")
 
         // Setup converter on main actor BEFORE installing tap.
         inputConverter = AVAudioConverter(from: inputFormat, to: targetInputFormat)
@@ -259,7 +308,7 @@ final class GeminiLiveService: ObservableObject {
             }
         }
         isMicTapInstalled = true
-        liveLogger.info("🎤 Mic tap installed. Input format: \(inputFormat.sampleRate)Hz \(inputFormat.channelCount)ch")
+        liveLogger.info("🎤 Mic tap installed OK")
     }
 
     // MARK: - Response listener
