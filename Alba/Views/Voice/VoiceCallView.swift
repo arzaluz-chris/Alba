@@ -2,8 +2,8 @@ import SwiftUI
 
 // MARK: - Voice Call View
 /// Full-screen modal presenting the voice conversation with Alba.
-/// Follows the design from the reference image: black background, large orb,
-/// timer and status text, mic-level dots, pause (bottom-left), end-call (center).
+/// Minimal ChatGPT-voice-inspired interface: subtle radial background, large
+/// orb, timer with label, single pulse indicator, pause (left), end-call (right).
 struct VoiceCallView: View {
     @StateObject var viewModel: VoiceCallViewModel
     @EnvironmentObject var languageManager: LanguageManager
@@ -13,16 +13,26 @@ struct VoiceCallView: View {
 
     var body: some View {
         ZStack {
-            Color.black
+            // Deep, subtly tinted background — more branded than pure black,
+            // still keeps focus on the orb.
+            backgroundGradient
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // MARK: - Top: timer
-                Text(viewModel.formattedElapsed)
-                    .font(AlbaFont.rounded(16, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.55))
-                    .monospacedDigit()
-                    .padding(.top, 16)
+                // MARK: - Top: timer + label
+                VStack(spacing: 2) {
+                    Text(viewModel.formattedElapsed)
+                        .font(AlbaFont.rounded(18, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.7))
+                        .monospacedDigit()
+
+                    Text(L10n.t(.voiceCallTimerLabel, lang))
+                        .font(AlbaFont.rounded(11, weight: .medium))
+                        .foregroundColor(.white.opacity(0.35))
+                        .tracking(0.8)
+                        .textCase(.uppercase)
+                }
+                .padding(.top, 20)
 
                 Spacer()
 
@@ -34,19 +44,20 @@ struct VoiceCallView: View {
 
                 Spacer()
 
-                // MARK: - Status + mic dots
-                VStack(spacing: 14) {
-                    MicLevelDots(level: CGFloat(viewModel.liveService.inputAudioLevel))
+                // MARK: - Status line (single elegant row, no dot array)
+                HStack(spacing: 10) {
+                    StatusPulse(active: viewModel.liveService.isUserSpeaking ||
+                                       viewModel.liveService.isModelSpeaking)
 
                     Text(statusText)
                         .font(AlbaFont.rounded(16, weight: .semibold))
-                        .foregroundColor(.white.opacity(0.85))
+                        .foregroundColor(.white.opacity(0.9))
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 40)
-                        .transition(.opacity)
-                        .animation(.easeInOut(duration: 0.25), value: viewModel.state)
+                        .lineLimit(2)
                 }
-                .padding(.bottom, 36)
+                .padding(.horizontal, 40)
+                .animation(.easeInOut(duration: 0.35), value: statusText)
+                .padding(.bottom, 40)
 
                 // MARK: - Control bar
                 HStack(alignment: .center) {
@@ -55,12 +66,12 @@ struct VoiceCallView: View {
                         handlePauseTap()
                     } label: {
                         Image(systemName: viewModel.state == .paused ? "play.fill" : "pause.fill")
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.system(size: 20, weight: .bold))
                             .foregroundColor(.white)
-                            .frame(width: 56, height: 56)
+                            .frame(width: 60, height: 60)
                             .background(
                                 Circle()
-                                    .fill(Color.white.opacity(0.12))
+                                    .fill(Color.white.opacity(0.10))
                                     .overlay(Circle().stroke(Color.white.opacity(0.22), lineWidth: 1))
                             )
                     }
@@ -73,24 +84,24 @@ struct VoiceCallView: View {
                     Button {
                         Task { await endAndDismiss() }
                     } label: {
-                        Image(systemName: "xmark")
+                        Image(systemName: "phone.down.fill")
                             .font(.system(size: 26, weight: .bold))
                             .foregroundColor(.white)
-                            .frame(width: 72, height: 72)
+                            .frame(width: 68, height: 68)
                             .background(
                                 Circle()
-                                    .fill(Color.red.opacity(0.82))
-                                    .shadow(color: Color.red.opacity(0.5), radius: 14, y: 4)
+                                    .fill(Color(red: 0.90, green: 0.23, blue: 0.28))
+                                    .shadow(color: Color.red.opacity(0.45), radius: 14, y: 4)
                             )
                     }
 
                     Spacer()
 
                     // Invisible counter-weight so the end button stays centered
-                    Color.clear.frame(width: 56, height: 56)
+                    Color.clear.frame(width: 60, height: 60)
                 }
-                .padding(.horizontal, 32)
-                .padding(.bottom, 42)
+                .padding(.horizontal, 36)
+                .padding(.bottom, 36)
             }
         }
         .preferredColorScheme(.dark)
@@ -99,7 +110,24 @@ struct VoiceCallView: View {
         }
         .onChange(of: viewModel.state) { _, newState in
             if case .ended = newState { dismiss() }
-            if case .permissionDenied = newState { /* shown inline */ }
+        }
+    }
+
+    // MARK: - Background
+
+    private var backgroundGradient: some View {
+        ZStack {
+            Color.black
+            RadialGradient(
+                colors: [
+                    Color.albaAccent.opacity(0.14),
+                    Color.albaAccent.opacity(0.02),
+                    .black
+                ],
+                center: .center,
+                startRadius: 40,
+                endRadius: 700
+            )
         }
     }
 
@@ -120,10 +148,8 @@ struct VoiceCallView: View {
             return L10n.t(.voiceCallMicPermissionDenied, lang)
         case .active:
             // Only flip between 2 states: Alba speaking, or Alba listening.
-            // We intentionally do NOT react to `isUserSpeaking` here because it
-            // toggles every time the user pauses between words, producing
-            // rapid flicker. "Alba is listening" is the honest default
-            // whenever the model isn't talking.
+            // "Listening" stays as the honest default so the label doesn't
+            // flicker every time the user pauses between words.
             if viewModel.liveService.isModelSpeaking {
                 return L10n.t(.voiceCallAlbaSpeaking, lang)
             }
@@ -154,38 +180,19 @@ struct VoiceCallView: View {
     }
 }
 
-// MARK: - Mic level dots
-/// 4 stacked dots that pulse with the user's current mic RMS (0-1).
-struct MicLevelDots: View {
-    let level: CGFloat
+// MARK: - Status pulse
+/// Single soft pulse that glows when there's real audio activity (user or
+/// model). Replaces the 4-dot mic meter, which flickered too much.
+struct StatusPulse: View {
+    let active: Bool
 
     var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "mic.fill")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(.white.opacity(0.7))
-                .padding(.trailing, 4)
-
-            ForEach(0..<4, id: \.self) { index in
-                Circle()
-                    .fill(Color.white.opacity(dotOpacity(index: index)))
-                    .frame(width: 6, height: 6)
-                    .scaleEffect(dotScale(index: index))
-                    .animation(.easeOut(duration: 0.15), value: level)
-            }
-        }
-    }
-
-    private func threshold(index: Int) -> CGFloat {
-        // Dot 0 activates first (low level), dot 3 needs strong signal.
-        return CGFloat(index + 1) * 0.18
-    }
-
-    private func dotOpacity(index: Int) -> Double {
-        level >= threshold(index: index) ? 1.0 : 0.22
-    }
-
-    private func dotScale(index: Int) -> CGFloat {
-        level >= threshold(index: index) ? 1.15 : 1.0
+        Circle()
+            .fill(active ? Color.albaAccent : Color.white.opacity(0.35))
+            .frame(width: 8, height: 8)
+            .scaleEffect(active ? 1.15 : 1.0)
+            .shadow(color: active ? Color.albaAccent.opacity(0.6) : .clear,
+                    radius: active ? 6 : 0)
+            .animation(.easeInOut(duration: 0.25), value: active)
     }
 }

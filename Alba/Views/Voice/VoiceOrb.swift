@@ -27,8 +27,11 @@ struct VoiceOrb: View {
     var body: some View {
         TimelineView(.animation) { timeline in
             let elapsed = timeline.date.timeIntervalSinceReferenceDate
-            // Smoothed audio drive — clamp and slightly compress to avoid jitter
             let drive = CGFloat(max(0, min(1, audioLevel)))
+            // Slow breathing motion, independent of audio, so the orb feels
+            // alive even in silence. Period ~4.5s. Amplitude varies by state.
+            let breath = CGFloat(sin(elapsed * 1.4)) * breathAmplitude
+            let combinedScale = baseScale(drive: drive) + breath
 
             ZStack {
                 // MARK: Glow
@@ -46,13 +49,14 @@ struct VoiceOrb: View {
                     )
                     .frame(width: orbSize * 2.2, height: orbSize * 2.2)
                     .blur(radius: 50)
+                    .scaleEffect(1.0 + breath * 0.5)
 
                 // MARK: Expanding rings
                 ForEach(0..<3, id: \.self) { index in
                     let phase = elapsed * ringSpeed + Double(index) * 0.6
                     let sine = CGFloat(sin(phase))
-                    let baseScale = 1.0 + CGFloat(index + 1) * 0.14
-                    let ringScale = baseScale + drive * 0.22 + sine * 0.03
+                    let ringBase = 1.0 + CGFloat(index + 1) * 0.14
+                    let ringScale = ringBase + drive * 0.22 + sine * 0.025
 
                     Circle()
                         .stroke(
@@ -75,7 +79,7 @@ struct VoiceOrb: View {
                 Circle()
                     .fill(LinearGradient.albaAccentGradient)
                     .frame(width: orbSize, height: orbSize)
-                    .scaleEffect(baseScale(drive: drive))
+                    .scaleEffect(combinedScale)
                     .shadow(color: Color.albaAccent.opacity(0.45), radius: 30, x: 0, y: 0)
 
                 // MARK: Inner highlight (glossy top-left)
@@ -92,16 +96,17 @@ struct VoiceOrb: View {
                         )
                     )
                     .frame(width: orbSize, height: orbSize)
-                    .scaleEffect(baseScale(drive: drive))
+                    .scaleEffect(combinedScale)
                     .blendMode(.plusLighter)
 
                 // MARK: Soft inner rim for depth
                 Circle()
                     .stroke(Color.white.opacity(0.18), lineWidth: 1)
                     .frame(width: orbSize, height: orbSize)
-                    .scaleEffect(baseScale(drive: drive))
+                    .scaleEffect(combinedScale)
             }
-            .animation(.easeOut(duration: 0.12), value: drive)
+            // Spring on drive changes for organic, non-jittery motion.
+            .animation(.interpolatingSpring(stiffness: 120, damping: 18), value: drive)
         }
         .frame(width: orbSize * 2.2, height: orbSize * 2.2)
         .accessibilityLabel("Alba voice orb")
@@ -112,11 +117,21 @@ struct VoiceOrb: View {
 
     private var ringSpeed: Double {
         switch state {
-        case .idle: return 0.7
-        case .connecting: return 1.4
-        case .listening: return 1.1
-        case .speaking: return 1.8
-        case .paused: return 0.35
+        case .idle: return 0.6
+        case .connecting: return 1.2
+        case .listening: return 0.9
+        case .speaking: return 1.3
+        case .paused: return 0.3
+        }
+    }
+
+    /// Slow "breathing" modulation so the orb feels alive in silence.
+    private var breathAmplitude: CGFloat {
+        switch state {
+        case .idle, .listening: return 0.018
+        case .connecting: return 0.025
+        case .paused: return 0.006
+        case .speaking: return 0.008 // less breathing when driven by audio
         }
     }
 

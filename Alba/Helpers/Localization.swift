@@ -68,8 +68,10 @@ enum LKey: String {
     case voiceCallDurationLabel
     case voiceCallMicPermissionDenied
     case voiceCallDailyLimitReached
+    case voiceCallDailyMinutesReached
     case voiceCallErrorGeneric
     case voiceCallMaxDurationReached
+    case voiceCallTimerLabel
 }
 
 // MARK: - Localization Helper
@@ -193,9 +195,11 @@ struct L10n {
         .voiceCallResumeButton: "Reanudar",
         .voiceCallDurationLabel: "Llamada de voz",
         .voiceCallMicPermissionDenied: "Alba necesita acceso al micrófono. Actívalo en Ajustes para usar el modo voz.",
-        .voiceCallDailyLimitReached: "Llegaste al límite diario de llamadas de voz. Vuelve mañana.",
+        .voiceCallDailyLimitReached: "Usaste todas tus llamadas de voz de hoy. Vuelve mañana.",
+        .voiceCallDailyMinutesReached: "Agotaste los minutos diarios de voz. Vuelve mañana.",
         .voiceCallErrorGeneric: "Algo salió mal con la llamada. Intenta de nuevo.",
-        .voiceCallMaxDurationReached: "Tiempo máximo de llamada alcanzado. Puedes iniciar otra."
+        .voiceCallMaxDurationReached: "Tiempo máximo de llamada alcanzado. Puedes iniciar otra.",
+        .voiceCallTimerLabel: "Llamada de voz"
     ]
 
     // MARK: - English
@@ -307,8 +311,10 @@ struct L10n {
         .voiceCallResumeButton: "Resume",
         .voiceCallDurationLabel: "Voice call",
         .voiceCallMicPermissionDenied: "Alba needs microphone access. Enable it in Settings to use voice mode.",
-        .voiceCallDailyLimitReached: "You've reached the daily voice call limit. Come back tomorrow.",
+        .voiceCallDailyLimitReached: "You've used all your voice calls for today. Come back tomorrow.",
+        .voiceCallDailyMinutesReached: "You've used your daily voice minutes. Come back tomorrow.",
         .voiceCallErrorGeneric: "Something went wrong with the call. Please try again.",
-        .voiceCallMaxDurationReached: "Maximum call duration reached. You can start another one."
+        .voiceCallMaxDurationReached: "Maximum call duration reached. You can start another one.",
+        .voiceCallTimerLabel: "Voice call"
     ]
 }

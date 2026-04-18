@@ -238,14 +238,12 @@ struct ChatView: View {
             .environmentObject(languageManager)
         }
         .alert(
-            L10n.t(.voiceCallDailyLimitReached, lang),
+            voiceLimitAlertTitle,
             isPresented: $showVoiceLimitAlert
         ) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text(lang == .es
-                 ? "Usaste tus \(voiceLimiter.dailyCallLimit) llamadas de voz de hoy. El contador se reinicia mañana."
-                 : "You've used your \(voiceLimiter.dailyCallLimit) voice calls for today. The counter resets tomorrow.")
+            Text(voiceLimitAlertMessage)
         }
         .fullScreenCover(isPresented: $showAIOnboarding, onDismiss: {
             // After onboarding completes, now initialize chat with user's chosen style
@@ -259,6 +257,28 @@ struct ChatView: View {
         guard !viewModel.currentInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         HapticManager.shared.mediumImpact()
         viewModel.sendMessage()
+    }
+
+    // MARK: - Voice limit alert copy
+
+    /// True when the minutes-cap was the reason — different title from calls-cap.
+    private var voiceLimitAlertTitle: String {
+        if voiceLimiter.hasReachedSecondsLimit {
+            return L10n.t(.voiceCallDailyMinutesReached, lang)
+        }
+        return L10n.t(.voiceCallDailyLimitReached, lang)
+    }
+
+    private var voiceLimitAlertMessage: String {
+        if voiceLimiter.hasReachedSecondsLimit {
+            let mins = voiceLimiter.dailyTotalSecondsLimit / 60
+            return lang == .es
+                ? "Agotaste los \(mins) minutos diarios de voz. El contador se reinicia mañana."
+                : "You've used your \(mins) daily voice minutes. The counter resets tomorrow."
+        }
+        return lang == .es
+            ? "Usaste tus \(voiceLimiter.dailyCallLimit) llamadas de voz de hoy. El contador se reinicia mañana."
+            : "You've used your \(voiceLimiter.dailyCallLimit) voice calls for today. The counter resets tomorrow."
     }
 
     private func scrollToBottom(_ proxy: ScrollViewProxy) {

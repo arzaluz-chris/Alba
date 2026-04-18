@@ -34,12 +34,30 @@ final class VoiceRateLimiter: ObservableObject {
         RemoteConfigService.shared.maxVoiceCallSeconds
     }
 
+    /// Hard ceiling on total voice-call seconds per day. Protects the free tier.
+    var dailyTotalSecondsLimit: Int {
+        RemoteConfigService.shared.maxDailyVoiceSeconds
+    }
+
     var callsRemaining: Int {
         max(0, dailyCallLimit - callsUsedToday)
     }
 
+    var secondsRemaining: Int {
+        max(0, dailyTotalSecondsLimit - secondsUsedToday)
+    }
+
+    /// Either cap blocks the user.
     var hasReachedLimit: Bool {
+        hasReachedCallsLimit || hasReachedSecondsLimit
+    }
+
+    var hasReachedCallsLimit: Bool {
         callsUsedToday >= dailyCallLimit
+    }
+
+    var hasReachedSecondsLimit: Bool {
+        secondsUsedToday >= dailyTotalSecondsLimit
     }
 
     /// Call this after a voice call finishes to persist the usage.

@@ -32,6 +32,13 @@ final class GeminiLiveService: ObservableObject {
     private var isMicTapInstalled = false
     private var isPaused = false
 
+    // Half-duplex guard: when Alba is speaking, stop forwarding the mic to
+    // the server. This prevents echo-path feedback (Alba's voice leaking from
+    // the speaker into the mic) from being interpreted as end-of-speech,
+    // which was the root cause of "dime, dime" / "te escucho" filler.
+    // Accessed from the audio thread → nonisolated(unsafe) atomic-ish Bool.
+    private nonisolated(unsafe) var suppressMicSend: Bool = false
+
     // AVAudioConverter is only touched from the realtime audio thread after being
     // set up on the main actor. We expose it as nonisolated(unsafe) so the tap
     // callback can read it without crossing the actor boundary.
@@ -75,11 +82,17 @@ final class GeminiLiveService: ObservableObject {
 
     private func configureAudioSession() throws {
         let session = AVAudioSession.sharedInstance()
+        // `.voiceChat` mode already picks the right processing chain. We DROP
+        // `.allowBluetoothA2DP` because A2DP is output-only and forces costly
+        // profile switches that can hand us back a zero-sample-rate mic format
+        // on iOS 26. HFP remains so headsets with mic still work.
         try session.setCategory(
             .playAndRecord,
             mode: .voiceChat,
-            options: [.defaultToSpeaker, .allowBluetoothHFP, .allowBluetoothA2DP]
+            options: [.defaultToSpeaker, .allowBluetoothHFP]
         )
+        // Prefer a tight I/O buffer for low-latency real-time conversation.
+        try? session.setPreferredIOBufferDuration(0.02) // ~20 ms
         try session.setActive(true, options: [])
     }
 
@@ -167,6 +180,7 @@ final class GeminiLiveService: ObservableObject {
         isUserSpeaking = false
         outputAudioLevel = 0
         inputAudioLevel = 0
+        suppressMicSend = false
 
         deactivateAudioSession()
     }
@@ -211,6 +225,7 @@ final class GeminiLiveService: ObservableObject {
         audioPlayerNode.play()
         isModelSpeaking = false
         outputAudioLevel = 0
+        suppressMicSend = false
     }
 
     // MARK: - Mic Capture
@@ -262,13 +277,19 @@ final class GeminiLiveService: ObservableObject {
         let converter = inputConverter
         let target = targetInputFormat
 
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) { [weak self] buffer, _ in
+        // Larger buffer (2048) → ~43 ms at 48 kHz → steadier sample-rate
+        // conversion, fewer boundary artifacts, less CPU pressure.
+        inputNode.installTap(onBus: 0, bufferSize: 2048, format: inputFormat) { [weak self] buffer, _ in
             // Running on the realtime audio thread.
-            let rms = Self.computeRMS(buffer: buffer)
+            guard let self else { return }
 
-            // Convert to target format (PCM16 16 kHz mono)
+            let rms = Self.computeRMS(buffer: buffer)
+            // Snapshot the half-duplex flag without crossing the actor.
+            let shouldSend = !self.suppressMicSend
+
+            // Convert to target format (PCM16 16 kHz mono) ONLY when we'll actually send it.
             var audioData: Data?
-            if let converter {
+            if shouldSend, let converter {
                 let ratio = target.sampleRate / buffer.format.sampleRate
                 let targetFrames = AVAudioFrameCount(Double(buffer.frameLength) * ratio) + 256
 
@@ -294,17 +315,19 @@ final class GeminiLiveService: ObservableObject {
                 }
             }
 
-            // Hop back to main actor with Sendable values only (Float + optional Data)
-            let capturedData = audioData
+            // Send audio directly off the audio thread (no main hop) — cuts ~1
+            // runloop of latency per frame. Only the UI level update goes to main.
+            if let audioData {
+                Task { [weak self] in
+                    await self?.session?.sendAudioRealtime(audioData)
+                }
+            }
+
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
-                self.inputAudioLevel = rms
-                self.isUserSpeaking = rms > 0.08
-                if let capturedData {
-                    Task { [weak self] in
-                        await self?.session?.sendAudioRealtime(capturedData)
-                    }
-                }
+                // Exponential smoothing so the orb doesn't jitter every 43 ms.
+                self.inputAudioLevel = self.inputAudioLevel * 0.6 + rms * 0.4
+                self.isUserSpeaking = self.inputAudioLevel > 0.06
             }
         }
         isMicTapInstalled = true
@@ -348,6 +371,7 @@ final class GeminiLiveService: ObservableObject {
             audioPlayerNode.play()
             isModelSpeaking = false
             outputAudioLevel = 0
+            suppressMicSend = false
             return
         }
 
@@ -355,7 +379,13 @@ final class GeminiLiveService: ObservableObject {
             for part in modelTurn.parts {
                 if let inline = part as? InlineDataPart,
                    inline.mimeType.starts(with: "audio/pcm") {
-                    isModelSpeaking = true
+                    if !isModelSpeaking {
+                        isModelSpeaking = true
+                        // Engage the half-duplex gate as soon as Alba starts
+                        // speaking — the mic keeps running (for the orb) but
+                        // we stop forwarding chunks to the server.
+                        suppressMicSend = true
+                    }
                     playAudioData(inline.data)
                 }
             }
@@ -364,6 +394,8 @@ final class GeminiLiveService: ObservableObject {
         if content.isTurnComplete {
             isModelSpeaking = false
             outputAudioLevel = 0
+            // Re-open the mic pipe for the next user turn.
+            suppressMicSend = false
         }
     }
 
@@ -385,8 +417,9 @@ final class GeminiLiveService: ObservableObject {
             }
         }
 
-        // Publish RMS for orb
-        outputAudioLevel = Self.computeRMS(buffer: buffer)
+        // Publish smoothed RMS for orb so the animation doesn't jitter.
+        let raw = Self.computeRMS(buffer: buffer)
+        outputAudioLevel = outputAudioLevel * 0.55 + raw * 0.45
 
         audioPlayerNode.scheduleBuffer(buffer)
         if !audioPlayerNode.isPlaying {
