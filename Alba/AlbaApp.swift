@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import FirebaseCore
 
 // MARK: - AppDelegate for Quick Actions
 class AlbaAppDelegate: NSObject, UIApplicationDelegate {
@@ -44,6 +45,9 @@ struct AlbaApp: App {
     @StateObject private var musicViewModel = MusicViewModel()
 
     init() {
+        // Initialize Firebase (reads GoogleService-Info.plist). Required for FirebaseAI Live API.
+        FirebaseApp.configure()
+
         // Request notification permission after a brief delay (after onboarding)
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             if UserDefaults.standard.bool(forKey: "has_completed_onboarding") {

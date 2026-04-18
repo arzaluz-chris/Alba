@@ -10,6 +10,10 @@ struct ChatView: View {
 
     @State private var showHistory = false
     @State private var showAIOnboarding = false
+    @State private var showVoiceCall = false
+    @State private var showVoiceLimitAlert = false
+    @State private var hasInitializedSession = false
+    @ObservedObject private var voiceLimiter = VoiceRateLimiter.shared
 
     init(currentView: Binding<AppState>, userViewModel: UserViewModel, initialContext: String?) {
         self._currentView = currentView
@@ -160,6 +164,32 @@ struct ChatView: View {
                             .overlay(Capsule().stroke(Color.white.opacity(0.3), lineWidth: 0.5))
                             .onSubmit { sendMessage() }
 
+                        // Voice mode button — only visible if feature is enabled via RemoteConfig
+                        if RemoteConfigService.shared.isVoiceModeEnabled {
+                            Button {
+                                HapticManager.shared.mediumImpact()
+                                if voiceLimiter.hasReachedLimit {
+                                    showVoiceLimitAlert = true
+                                    HapticManager.shared.notification(.warning)
+                                } else {
+                                    viewModel.saveCurrentConversation()
+                                    showVoiceCall = true
+                                }
+                            } label: {
+                                Image(systemName: "waveform")
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 40, height: 40)
+                                    .background(
+                                        voiceLimiter.hasReachedLimit
+                                            ? AnyShapeStyle(Color.gray.opacity(0.35))
+                                            : AnyShapeStyle(LinearGradient.albaAccentGradient)
+                                    )
+                                    .clipShape(Circle())
+                            }
+                            .accessibilityLabel(L10n.t(.voiceModeButton, lang))
+                        }
+
                         Button {
                             sendMessage()
                         } label: {
@@ -197,6 +227,26 @@ struct ChatView: View {
         .sheet(isPresented: $showHistory) {
             ChatHistoryView(viewModel: viewModel)
         }
+        .fullScreenCover(isPresented: $showVoiceCall) {
+            VoiceCallView(
+                viewModel: VoiceCallViewModel(
+                    chatViewModel: viewModel,
+                    language: lang,
+                    userName: userViewModel.userName
+                )
+            )
+            .environmentObject(languageManager)
+        }
+        .alert(
+            L10n.t(.voiceCallDailyLimitReached, lang),
+            isPresented: $showVoiceLimitAlert
+        ) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(lang == .es
+                 ? "Usaste tus \(voiceLimiter.dailyCallLimit) llamadas de voz de hoy. El contador se reinicia mañana."
+                 : "You've used your \(voiceLimiter.dailyCallLimit) voice calls for today. The counter resets tomorrow.")
+        }
         .fullScreenCover(isPresented: $showAIOnboarding, onDismiss: {
             // After onboarding completes, now initialize chat with user's chosen style
             initializeChatIfNeeded()
@@ -218,6 +268,13 @@ struct ChatView: View {
     }
 
     private func initializeChatIfNeeded() {
+        // Only run once per ChatView lifetime. Without this guard, the view's
+        // .onAppear re-fires when a fullScreenCover (voice mode, AI onboarding)
+        // dismisses — which would wipe the current conversation and create a
+        // fresh one, losing any voice call summary that was just appended.
+        guard !hasInitializedSession else { return }
+        hasInitializedSession = true
+
         guard viewModel.messages.isEmpty else { return }
 
         if let context = initialContext {
