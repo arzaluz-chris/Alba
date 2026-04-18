@@ -214,49 +214,55 @@ struct ChatBubble: View {
     var onDeclineTest: ((String) -> Void)?
 
     var body: some View {
-        VStack(alignment: message.isUser ? .trailing : .leading, spacing: 6) {
-            // Main message bubble
-            HStack(alignment: .bottom, spacing: 8) {
-                if message.isUser { Spacer(minLength: 50) }
+        // Voice call summary is a system event — render as centered pill without avatar/bubble
+        if case .voiceCallSummary(let seconds) = message.action {
+            VoiceCallSummaryPill(durationSeconds: seconds)
+                .frame(maxWidth: .infinity)
+        } else {
+            VStack(alignment: message.isUser ? .trailing : .leading, spacing: 6) {
+                // Main message bubble
+                HStack(alignment: .bottom, spacing: 8) {
+                    if message.isUser { Spacer(minLength: 50) }
 
-                if !message.isUser {
-                    AlbaAvatar(size: 32)
+                    if !message.isUser {
+                        AlbaAvatar(size: 32)
+                    }
+
+                    Text(markdownToAttributed(message.text))
+                        .font(AlbaFont.rounded(15))
+                        .lineSpacing(5)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(
+                            message.isUser
+                                ? AnyShapeStyle(LinearGradient.albaAccentGradient)
+                                : AnyShapeStyle(.ultraThinMaterial)
+                        )
+                        .foregroundColor(message.isUser ? .white : .albaText)
+                        .clipShape(
+                            RoundedCorner(
+                                radius: 20,
+                                corners: message.isUser
+                                    ? [.topLeft, .topRight, .bottomLeft]
+                                    : [.topLeft, .topRight, .bottomRight]
+                            )
+                        )
+                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                        .frame(maxWidth: UIScreen.main.bounds.width * 0.75,
+                               alignment: message.isUser ? .trailing : .leading)
+
+                    if !message.isUser { Spacer(minLength: 50) }
                 }
 
-                Text(markdownToAttributed(message.text))
-                    .font(AlbaFont.rounded(15))
-                    .lineSpacing(5)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(
-                        message.isUser
-                            ? AnyShapeStyle(LinearGradient.albaAccentGradient)
-                            : AnyShapeStyle(.ultraThinMaterial)
+                // Embedded "Take Test" card if action is present
+                if case .takeTest(let friendName) = message.action {
+                    TakeTestCard(
+                        friendName: friendName,
+                        onAccept: { onTakeTest?(friendName) },
+                        onDecline: { onDeclineTest?(friendName) }
                     )
-                    .foregroundColor(message.isUser ? .white : .albaText)
-                    .clipShape(
-                        RoundedCorner(
-                            radius: 20,
-                            corners: message.isUser
-                                ? [.topLeft, .topRight, .bottomLeft]
-                                : [.topLeft, .topRight, .bottomRight]
-                        )
-                    )
-                    .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
-                    .frame(maxWidth: UIScreen.main.bounds.width * 0.75,
-                           alignment: message.isUser ? .trailing : .leading)
-
-                if !message.isUser { Spacer(minLength: 50) }
-            }
-
-            // Embedded "Take Test" card if action is present
-            if case .takeTest(let friendName) = message.action {
-                TakeTestCard(
-                    friendName: friendName,
-                    onAccept: { onTakeTest?(friendName) },
-                    onDecline: { onDeclineTest?(friendName) }
-                )
-                .padding(.leading, 40) // Align with bubble (after avatar)
+                    .padding(.leading, 40) // Align with bubble (after avatar)
+                }
             }
         }
     }
@@ -348,6 +354,53 @@ struct TakeTestCard: View {
         .offset(y: appeared ? 0 : 10)
         .onAppear {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                appeared = true
+            }
+        }
+    }
+}
+
+// MARK: - Voice Call Summary Pill
+/// Centered glassmorphism pill inserted into the chat after a voice call ends.
+/// Shows an icon + label + formatted duration (e.g. "Voice call · 2m 34s").
+struct VoiceCallSummaryPill: View {
+    let durationSeconds: Int
+
+    @EnvironmentObject var languageManager: LanguageManager
+    @State private var appeared = false
+
+    private var lang: AppLanguage { languageManager.language }
+
+    private var formattedDuration: String {
+        let minutes = durationSeconds / 60
+        let seconds = durationSeconds % 60
+        if minutes > 0 {
+            return "\(minutes)m \(seconds)s"
+        }
+        return "\(seconds)s"
+    }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "phone.down.fill")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.albaAccent)
+            Text("\(L10n.t(.voiceCallDurationLabel, lang)) · \(formattedDuration)")
+                .font(AlbaFont.rounded(13, weight: .semibold))
+                .foregroundColor(.albaText.opacity(0.85))
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+        .background(.ultraThinMaterial)
+        .clipShape(Capsule())
+        .overlay(
+            Capsule().stroke(Color.albaAccent.opacity(0.25), lineWidth: 0.8)
+        )
+        .shadow(color: Color.albaAccent.opacity(0.12), radius: 4, x: 0, y: 2)
+        .opacity(appeared ? 1 : 0)
+        .scaleEffect(appeared ? 1 : 0.9)
+        .onAppear {
+            withAnimation(.spring(response: 0.45, dampingFraction: 0.75)) {
                 appeared = true
             }
         }

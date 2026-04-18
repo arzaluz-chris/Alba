@@ -4,6 +4,7 @@ enum MessageAction: Equatable {
     case none
     case takeTest(friendName: String) // Embed "Take Test" card for this friend
     case testDeclined(friendName: String) // User dismissed the offer for this friend
+    case voiceCallSummary(durationSeconds: Int) // Pill summarizing a finished voice call
 }
 
 struct Message: Identifiable, Equatable {

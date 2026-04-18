@@ -13,6 +13,15 @@ struct AppConfig: Codable {
     var albaTestEnabled: Bool = true
     var journalEnabled: Bool = true
     var blocksEnabled: Bool = true
+
+    // Voice Mode
+    var voiceModeEnabled: Bool = true
+    var geminiLiveModel: String = "gemini-2.5-flash-native-audio-preview-09-2025"
+    var geminiLiveVoiceName: String = "Despina"
+    var maxDailyVoiceCalls: Int = 3
+    var maxDailyVoiceCallsUnregistered: Int = 1
+    var maxVoiceCallSeconds: Int = 300 // 5 min — conservative per-call cap
+    var maxDailyVoiceSeconds: Int = 900 // 15 min total/day hard cap to protect free tier
 }
 
 // MARK: - Remote Config Service
@@ -35,6 +44,15 @@ final class RemoteConfigService {
     var isAlbaTestEnabled: Bool { config.albaTestEnabled }
     var isJournalEnabled: Bool { config.journalEnabled }
     var isBlocksEnabled: Bool { config.blocksEnabled }
+
+    // Voice Mode
+    var isVoiceModeEnabled: Bool { config.voiceModeEnabled }
+    var geminiLiveModel: String { config.geminiLiveModel }
+    var geminiLiveVoiceName: String { config.geminiLiveVoiceName }
+    var maxDailyVoiceCalls: Int { config.maxDailyVoiceCalls }
+    var maxDailyVoiceCallsUnregistered: Int { config.maxDailyVoiceCallsUnregistered }
+    var maxVoiceCallSeconds: Int { config.maxVoiceCallSeconds }
+    var maxDailyVoiceSeconds: Int { config.maxDailyVoiceSeconds }
 
     // MARK: - Init
 

@@ -55,6 +55,23 @@ enum LKey: String {
     case aiOnboardingTourPersonalizationTitle, aiOnboardingTourPersonalizationBody
     case aiOnboardingDoneTitle, aiOnboardingDoneBody
     case aiOnboardingContinue, aiOnboardingGetStarted
+
+    // Voice Mode
+    case voiceModeButton
+    case voiceCallConnecting
+    case voiceCallStartSpeaking
+    case voiceCallAlbaListening
+    case voiceCallAlbaSpeaking
+    case voiceCallPaused
+    case voiceCallEndButton
+    case voiceCallResumeButton
+    case voiceCallDurationLabel
+    case voiceCallMicPermissionDenied
+    case voiceCallDailyLimitReached
+    case voiceCallDailyMinutesReached
+    case voiceCallErrorGeneric
+    case voiceCallMaxDurationReached
+    case voiceCallTimerLabel
 }
 
 // MARK: - Localization Helper
@@ -166,7 +183,23 @@ struct L10n {
         .aiOnboardingDoneTitle: "Todo listo",
         .aiOnboardingDoneBody: "Alba esta lista para ayudarte. Comencemos!",
         .aiOnboardingContinue: "Continuar",
-        .aiOnboardingGetStarted: "Comenzar"
+        .aiOnboardingGetStarted: "Comenzar",
+
+        .voiceModeButton: "Modo voz",
+        .voiceCallConnecting: "Conectando con Alba...",
+        .voiceCallStartSpeaking: "Comienza a hablar",
+        .voiceCallAlbaListening: "Alba está escuchando",
+        .voiceCallAlbaSpeaking: "Alba está hablando",
+        .voiceCallPaused: "En pausa",
+        .voiceCallEndButton: "Finalizar",
+        .voiceCallResumeButton: "Reanudar",
+        .voiceCallDurationLabel: "Llamada de voz",
+        .voiceCallMicPermissionDenied: "Alba necesita acceso al micrófono. Actívalo en Ajustes para usar el modo voz.",
+        .voiceCallDailyLimitReached: "Usaste todas tus llamadas de voz de hoy. Vuelve mañana.",
+        .voiceCallDailyMinutesReached: "Agotaste los minutos diarios de voz. Vuelve mañana.",
+        .voiceCallErrorGeneric: "Algo salió mal con la llamada. Intenta de nuevo.",
+        .voiceCallMaxDurationReached: "Tiempo máximo de llamada alcanzado. Puedes iniciar otra.",
+        .voiceCallTimerLabel: "Llamada de voz"
     ]
 
     // MARK: - English
@@ -266,6 +299,22 @@ struct L10n {
         .aiOnboardingDoneTitle: "All set",
         .aiOnboardingDoneBody: "Alba is ready to help you. Let's get started!",
         .aiOnboardingContinue: "Continue",
-        .aiOnboardingGetStarted: "Get started"
+        .aiOnboardingGetStarted: "Get started",
+
+        .voiceModeButton: "Voice mode",
+        .voiceCallConnecting: "Connecting to Alba...",
+        .voiceCallStartSpeaking: "Start speaking",
+        .voiceCallAlbaListening: "Alba is listening",
+        .voiceCallAlbaSpeaking: "Alba is speaking",
+        .voiceCallPaused: "Paused",
+        .voiceCallEndButton: "End",
+        .voiceCallResumeButton: "Resume",
+        .voiceCallDurationLabel: "Voice call",
+        .voiceCallMicPermissionDenied: "Alba needs microphone access. Enable it in Settings to use voice mode.",
+        .voiceCallDailyLimitReached: "You've used all your voice calls for today. Come back tomorrow.",
+        .voiceCallDailyMinutesReached: "You've used your daily voice minutes. Come back tomorrow.",
+        .voiceCallErrorGeneric: "Something went wrong with the call. Please try again.",
+        .voiceCallMaxDurationReached: "Maximum call duration reached. You can start another one.",
+        .voiceCallTimerLabel: "Voice call"
     ]
 }

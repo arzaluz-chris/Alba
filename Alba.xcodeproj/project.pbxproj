@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B97CDAC82F8B186E008DDBC8 /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = B97CDAC72F8B186E008DDBC8 /* FirebaseAI */; };
+		B97CDAD02F8B186F008DDBC8 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = B97CDACF2F8B186F008DDBC8 /* FirebaseCore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		B92F4B922F737D5E0086DD61 /* Alba.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Alba.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +28,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B97CDAC82F8B186E008DDBC8 /* FirebaseAI in Frameworks */,
+				B97CDAD02F8B186F008DDBC8 /* FirebaseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +72,8 @@
 			);
 			name = Alba;
 			packageProductDependencies = (
+				B97CDAC72F8B186E008DDBC8 /* FirebaseAI */,
+				B97CDACF2F8B186F008DDBC8 /* FirebaseCore */,
 			);
 			productName = Alba;
 			productReference = B92F4B922F737D5E0086DD61 /* Alba.app */;
@@ -95,6 +104,9 @@
 			);
 			mainGroup = B92F4B892F737D5E0086DD61;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B97CDAC62F8B186E008DDBC8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B92F4B932F737D5E0086DD61 /* Products */;
 			projectDirPath = "";
@@ -264,6 +276,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Alba needs access to Apple Music to search and play songs.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Alba uses Face ID to protect your journal.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Alba needs your microphone to talk with you in voice mode.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -308,6 +321,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Alba needs access to Apple Music to search and play songs.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Alba uses Face ID to protect your journal.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Alba needs your microphone to talk with you in voice mode.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -357,6 +371,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B97CDAC62F8B186E008DDBC8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B97CDAC72F8B186E008DDBC8 /* FirebaseAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B97CDAC62F8B186E008DDBC8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAI;
+		};
+		B97CDACF2F8B186F008DDBC8 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B97CDAC62F8B186E008DDBC8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B92F4B8A2F737D5E0086DD61 /* Project object */;
 }
