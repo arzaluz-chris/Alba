@@ -9,6 +9,12 @@ final class LanguageManager: ObservableObject {
     }
 
     init() {
+        if let screenshot = ScreenshotMode.current {
+            self.language = screenshot.language
+            UserDefaults.standard.set(screenshot.language.rawValue, forKey: "app_language")
+            return
+        }
+
         // Default to system language or Spanish
         let preferredLang = Locale.current.language.languageCode?.identifier ?? "es"
         let savedLang = UserDefaults.standard.string(forKey: "app_language")

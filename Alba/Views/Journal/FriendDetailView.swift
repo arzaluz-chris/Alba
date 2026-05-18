@@ -38,7 +38,7 @@ struct FriendDetailView: View {
                             .foregroundColor(.albaText)
 
                         if let latest {
-                            Text(latest.rating)
+                            Text(latest.localizedRating(for: lang))
                                 .font(AlbaFont.rounded(14, weight: .semibold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 16)
@@ -74,9 +74,11 @@ struct FriendDetailView: View {
                         // Chat with Alba button
                         Button {
                             HapticManager.shared.mediumImpact()
+                            let latestRating = latest?.localizedRating(for: lang)
+                            let latestFocusArea = latest?.localizedFocusArea(for: lang)
                             let context = lang == .es
-                                ? "Quiero hablar sobre mi amistad con \(friendName). Mis resultados más recientes: \(latest?.rating ?? "sin evaluar"), área de enfoque: \(latest?.focusArea ?? "ninguna")."
-                                : "I want to talk about my friendship with \(friendName). My latest results: \(latest?.rating ?? "not evaluated"), focus area: \(latest?.focusArea ?? "none")."
+                                ? "Quiero hablar sobre mi amistad con \(friendName). Mis resultados más recientes: \(latestRating ?? "sin evaluar"), área de enfoque: \(latestFocusArea ?? "ninguna")."
+                                : "I want to talk about my friendship with \(friendName). My latest results: \(latestRating ?? "not evaluated"), focus area: \(latestFocusArea ?? "none")."
                             dismiss()
                             onNavigate?(.chat(initialContext: context))
                         } label: {
@@ -205,7 +207,7 @@ struct FriendDetailView: View {
                                         .foregroundColor(.albaText)
                                 }
                                 Spacer()
-                                Text(record.rating)
+                                Text(record.localizedRating(for: lang))
                                     .font(AlbaFont.rounded(13, weight: .semibold))
                                     .foregroundColor(ratingColor(record.overallScore))
                             }

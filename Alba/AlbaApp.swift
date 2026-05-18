@@ -48,6 +48,11 @@ struct AlbaApp: App {
         // Initialize Firebase (reads GoogleService-Info.plist). Required for FirebaseAI Live API.
         FirebaseApp.configure()
 
+        if ScreenshotMode.isActive {
+            UserDefaults.standard.set(false, forKey: "has_completed_onboarding")
+            return
+        }
+
         // Request notification permission after a brief delay (after onboarding)
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             if UserDefaults.standard.bool(forKey: "has_completed_onboarding") {
@@ -64,10 +69,12 @@ struct AlbaApp: App {
                 .environmentObject(userViewModel)
                 .environmentObject(musicViewModel)
                 .task {
+                    guard !ScreenshotMode.isActive else { return }
                     await RemoteConfigService.shared.fetchConfig()
                     QuickActionManager.shared.setupShortcuts(lang: languageManager.language)
                 }
                 .onChange(of: languageManager.language) { newLang in
+                    guard !ScreenshotMode.isActive else { return }
                     QuickActionManager.shared.setupShortcuts(lang: newLang)
                 }
         }

@@ -31,7 +31,7 @@ final class VoiceRateLimiter: ObservableObject {
 
     /// Client-side cap per individual call. Buffer against Gemini Live's 15 min hard cap.
     var maxSessionSeconds: Int {
-        RemoteConfigService.shared.maxVoiceCallSeconds
+        min(RemoteConfigService.shared.maxVoiceCallSeconds, secondsRemaining)
     }
 
     /// Hard ceiling on total voice-call seconds per day. Protects the free tier.

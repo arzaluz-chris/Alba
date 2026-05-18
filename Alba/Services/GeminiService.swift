@@ -318,11 +318,13 @@ final class GeminiService {
             let categories = latest.categoryScores
                 .map { "\($0.key): \(scoreLevel($0.value, lang: language))" }
                 .joined(separator: ", ")
+            let rating = latest.localizedRating(for: language)
+            let focusArea = latest.localizedFocusArea(for: language)
 
             if language == .es {
-                lines.append("- \(friend): Estado=\(latest.rating), Área de enfoque=\(latest.focusArea), Categorías=[\(categories)], Evaluaciones=\(records.count), Última=\(latest.displayDate)")
+                lines.append("- \(friend): Estado=\(rating), Área de enfoque=\(focusArea), Categorías=[\(categories)], Evaluaciones=\(records.count), Última=\(latest.displayDate)")
             } else {
-                lines.append("- \(friend): Status=\(latest.rating), Focus area=\(latest.focusArea), Categories=[\(categories)], Evaluations=\(records.count), Last=\(latest.displayDate)")
+                lines.append("- \(friend): Status=\(rating), Focus area=\(focusArea), Categories=[\(categories)], Evaluations=\(records.count), Last=\(latest.displayDate)")
             }
 
             // Include recent diary entries for context

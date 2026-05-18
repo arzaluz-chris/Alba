@@ -22,6 +22,29 @@ struct AppConfig: Codable {
     var maxDailyVoiceCallsUnregistered: Int = 1
     var maxVoiceCallSeconds: Int = 300 // 5 min — conservative per-call cap
     var maxDailyVoiceSeconds: Int = 900 // 15 min total/day hard cap to protect free tier
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let defaults = AppConfig()
+
+        geminiModel = try container.decodeIfPresent(String.self, forKey: .geminiModel) ?? defaults.geminiModel
+        maxDailyChatMessages = try container.decodeIfPresent(Int.self, forKey: .maxDailyChatMessages) ?? defaults.maxDailyChatMessages
+        maxDailyUnregisteredMessages = try container.decodeIfPresent(Int.self, forKey: .maxDailyUnregisteredMessages) ?? defaults.maxDailyUnregisteredMessages
+        chatEnabled = try container.decodeIfPresent(Bool.self, forKey: .chatEnabled) ?? defaults.chatEnabled
+        albaTestEnabled = try container.decodeIfPresent(Bool.self, forKey: .albaTestEnabled) ?? defaults.albaTestEnabled
+        journalEnabled = try container.decodeIfPresent(Bool.self, forKey: .journalEnabled) ?? defaults.journalEnabled
+        blocksEnabled = try container.decodeIfPresent(Bool.self, forKey: .blocksEnabled) ?? defaults.blocksEnabled
+
+        voiceModeEnabled = try container.decodeIfPresent(Bool.self, forKey: .voiceModeEnabled) ?? defaults.voiceModeEnabled
+        geminiLiveModel = try container.decodeIfPresent(String.self, forKey: .geminiLiveModel) ?? defaults.geminiLiveModel
+        geminiLiveVoiceName = try container.decodeIfPresent(String.self, forKey: .geminiLiveVoiceName) ?? defaults.geminiLiveVoiceName
+        maxDailyVoiceCalls = try container.decodeIfPresent(Int.self, forKey: .maxDailyVoiceCalls) ?? defaults.maxDailyVoiceCalls
+        maxDailyVoiceCallsUnregistered = try container.decodeIfPresent(Int.self, forKey: .maxDailyVoiceCallsUnregistered) ?? defaults.maxDailyVoiceCallsUnregistered
+        maxVoiceCallSeconds = try container.decodeIfPresent(Int.self, forKey: .maxVoiceCallSeconds) ?? defaults.maxVoiceCallSeconds
+        maxDailyVoiceSeconds = try container.decodeIfPresent(Int.self, forKey: .maxDailyVoiceSeconds) ?? defaults.maxDailyVoiceSeconds
+    }
 }
 
 // MARK: - Remote Config Service
@@ -38,8 +61,8 @@ final class RemoteConfigService {
     // MARK: - Typed Accessors
 
     var geminiModel: String { config.geminiModel }
-    var maxDailyChatMessages: Int { config.maxDailyChatMessages }
-    var maxDailyUnregisteredMessages: Int { config.maxDailyUnregisteredMessages }
+    var maxDailyChatMessages: Int { max(0, config.maxDailyChatMessages) }
+    var maxDailyUnregisteredMessages: Int { max(0, config.maxDailyUnregisteredMessages) }
     var isChatEnabled: Bool { config.chatEnabled }
     var isAlbaTestEnabled: Bool { config.albaTestEnabled }
     var isJournalEnabled: Bool { config.journalEnabled }
@@ -49,10 +72,10 @@ final class RemoteConfigService {
     var isVoiceModeEnabled: Bool { config.voiceModeEnabled }
     var geminiLiveModel: String { config.geminiLiveModel }
     var geminiLiveVoiceName: String { config.geminiLiveVoiceName }
-    var maxDailyVoiceCalls: Int { config.maxDailyVoiceCalls }
-    var maxDailyVoiceCallsUnregistered: Int { config.maxDailyVoiceCallsUnregistered }
-    var maxVoiceCallSeconds: Int { config.maxVoiceCallSeconds }
-    var maxDailyVoiceSeconds: Int { config.maxDailyVoiceSeconds }
+    var maxDailyVoiceCalls: Int { max(0, config.maxDailyVoiceCalls) }
+    var maxDailyVoiceCallsUnregistered: Int { max(0, config.maxDailyVoiceCallsUnregistered) }
+    var maxVoiceCallSeconds: Int { max(1, config.maxVoiceCallSeconds) }
+    var maxDailyVoiceSeconds: Int { max(0, config.maxDailyVoiceSeconds) }
 
     // MARK: - Init
 
@@ -70,6 +93,8 @@ final class RemoteConfigService {
     // MARK: - Fetch
 
     func fetchConfig() async {
+        guard !ScreenshotMode.isActive else { return }
+
         do {
             let (data, _) = try await URLSession.shared.data(from: configURL)
             let decoded = try JSONDecoder().decode(AppConfig.self, from: data)

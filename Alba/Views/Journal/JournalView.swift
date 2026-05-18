@@ -149,7 +149,7 @@ struct JournalView: View {
             // Rating badge
             if let latest {
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text(latest.rating)
+                    Text(latest.localizedRating(for: lang))
                         .font(AlbaFont.rounded(13, weight: .bold))
                         .foregroundColor(scoreColor(latest.overallScore))
                         .lineLimit(2)

@@ -85,6 +85,40 @@ final class ChatViewModel: ObservableObject {
         }
     }
 
+    func seedScreenshotConversation(language: AppLanguage) {
+        self.language = language
+        limitReached = false
+        isTyping = false
+        currentInput = ""
+
+        switch language {
+        case .es:
+            messages = [
+                Message(text: "¿Puedes analizar mi amistad con Laura?", isUser: true),
+                Message(text: "Me encanta que quieras mirar con calma tu vínculo con Laura, María. Por lo que has contado, hay una **base muy fuerte** de confianza y apoyo, y eso habla de una amistad que vale la pena cuidar.\n\nTu área de crecimiento parece ser **poner límites** sin sentir culpa. Podrías empezar con frases cálidas y claras, para proteger tu energía sin alejarte de ella.", isUser: false),
+                Message(text: "¿Cómo puedo decirle que no sin sonar fría?", isUser: true),
+                Message(text: "Puedes decir algo como: **\"Me encantaría verte, pero esta vez necesito descansar. Busquemos otro día.\"** Suena amable porque valida la relación, y firme porque no deja tu necesidad en negociación.", isUser: false)
+            ]
+            smartSuggestions = [
+                "Me da culpa decir que no",
+                "Quiero poner mejores límites",
+                "¿Qué hago si se molesta?"
+            ]
+        case .en:
+            messages = [
+                Message(text: "Can you analyze my friendship with Laura?", isUser: true),
+                Message(text: "It’s so good to look closer at your connection with Laura, Mary. Based on what you’ve shared, your friendship has a **strong foundation** of trust and support, which is the heart of a lasting bond.\n\nThe area to nurture is **boundaries**. You can protect your time and energy while still being the thoughtful, supportive friend you are.", isUser: false),
+                Message(text: "What is a gentle way to say no to Laura?", isUser: true),
+                Message(text: "Try something like: **\"I’d love to catch up, but I really need some downtime this weekend. Can we look at next week?\"** It keeps the connection warm while making your boundary clear.", isUser: false)
+            ]
+            smartSuggestions = [
+                "I feel guilty saying no",
+                "I want to set better boundaries",
+                "What if she gets upset?"
+            ]
+        }
+    }
+
     func loadConversation(_ saved: SavedConversation) {
         messages = saved.messages.map { Message(text: $0.text, isUser: $0.isUser) }
         conversationId = saved.id

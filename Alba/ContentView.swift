@@ -12,7 +12,7 @@ struct ContentView: View {
     @EnvironmentObject var musicViewModel: MusicViewModel
     @ObservedObject private var quickActionManager = QuickActionManager.shared
 
-    @State private var currentView: AppState = .splash
+    @State private var currentView: AppState = ScreenshotMode.current?.initialAppState ?? .splash
 
     var body: some View {
         ZStack {
@@ -63,7 +63,10 @@ struct ContentView: View {
 
     @ViewBuilder
     private var mainContent: some View {
-        switch currentView {
+        if let screenshot = ScreenshotMode.current, screenshot.screen == .voice {
+            ScreenshotVoiceCallView(language: screenshot.language)
+        } else {
+            switch currentView {
         case .splash:
             SplashView(currentView: $currentView)
         case .intro:
@@ -90,6 +93,7 @@ struct ContentView: View {
             AlbaBlocksView(currentView: $currentView)
         case .journal:
             JournalLockView(currentView: $currentView)
+            }
         }
     }
 

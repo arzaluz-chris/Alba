@@ -20,6 +20,14 @@ final class UserViewModel: ObservableObject {
     }
 
     init() {
+        if let screenshot = ScreenshotMode.current {
+            self.userName = screenshot.userName
+            self.selectedGender = .chica
+            self.hasCompletedOnboarding = true
+            self.hasCompletedAIOnboarding = true
+            return
+        }
+
         self.userName = UserDefaults.standard.string(forKey: "user_name") ?? ""
         if let genderRaw = UserDefaults.standard.string(forKey: "user_gender") {
             self.selectedGender = Gender(rawValue: genderRaw)

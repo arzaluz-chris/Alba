@@ -214,6 +214,11 @@ struct ChatView: View {
         }
         .onAppear {
             viewModel.language = lang
+            if let screenshot = ScreenshotMode.current, screenshot.screen == .chat {
+                viewModel.seedScreenshotConversation(language: screenshot.language)
+                hasInitializedSession = true
+                return
+            }
             if !userViewModel.hasCompletedAIOnboarding {
                 showAIOnboarding = true
                 // Don't call Gemini until onboarding is done
